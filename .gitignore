@@ -1,5 +1,6 @@
 *.o
 *.out
 *.vscode
+*.code-workspace
 
 /cpu.dSYM
