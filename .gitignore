@@ -3,4 +3,9 @@
 *.vscode
 *.code-workspace
 
+*.cmake
+CMakeCache.txt
+Makefile
+/CMakeFiles
+
 /cpu.dSYM

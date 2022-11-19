@@ -8,7 +8,7 @@
 #include "data.h"
 #include "machine_6502.h"
 
-static constexpr char* BIN_INSTRUCTION_FILE_PATH = "add.txt";
+const char* BIN_INSTRUCTION_FILE_PATH = "add.txt";
 
 std::vector<Byte> read_bin(const char* bin_instr)
 {
@@ -29,7 +29,7 @@ std::vector<Byte> read_bin(const char* bin_instr)
 
 int main()
 {
-  std::vector<Byte> binary_instructions = read_bin(BIN_INSTRUCTION_FILE_PATH);
+  // std::vector<Byte> binary_instructions = read_bin(BIN_INSTRUCTION_FILE_PATH);
 
   CPU CPU;
   Memory RAM;

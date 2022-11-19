@@ -1,5 +1,5 @@
 #ifndef MEMORY_H
-#define MEMORY
+#define MEMORY_H
 
 #include "data.h"
 
