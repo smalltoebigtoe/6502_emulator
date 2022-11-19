@@ -1,11 +1,10 @@
 #include "cpu.h"
 
-void CPU::reset(Memory& module) {
+void CPU::reset() {
   PC = 0xFFFC;
   SP = 0x0100;
   CF = ZF = IDF = DMF = BCF = OFF = NF = 0x0;
   A = X = Y = 0x0;
-  module.init();
 }
 
 Byte CPU::fetch_byte(Memory& module, u32 cycles) {

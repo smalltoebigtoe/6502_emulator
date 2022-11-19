@@ -1,17 +1,39 @@
 #include <iostream>
+#include <fstream>
+#include <vector>
+#include <stdexcept>
 
 #include "memory.h"
 #include "cpu.h"
+#include "data.h"
+#include "machine_6502.h"
 
-int main(void)
+static constexpr char* BIN_INSTRUCTION_FILE_PATH = "add.txt";
+
+std::vector<Byte> read_bin(const char* bin_instr)
 {
-  Memory RAM;
-  CPU CPU;
-  CPU.reset(RAM);
-  CPU.exe(RAM, 2);  // executes 2 instructions 
+    std::streampos bin_size;
+    std::ifstream file(bin_instr, std::ios::binary);
 
-  std::cout << RAM.data[RAM.MAX-1] << '\n';
-  std::cout << CPU.PC << '\n';
+    if (file.fail())
+      throw std::runtime_error("Failed to open binary instruction file.");
+
+    file.seekg(0, std::ios::end);
+    bin_size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    std::vector<Byte> fileData(bin_size);
+    file.read((char*) &fileData[0], bin_size);
+    return fileData;
+}
+
+int main()
+{
+  std::vector<Byte> binary_instructions = read_bin(BIN_INSTRUCTION_FILE_PATH);
+
+  CPU CPU;
+  Memory RAM;
+  Machine_6502 machine(CPU, RAM);
 
   return 0;
 }

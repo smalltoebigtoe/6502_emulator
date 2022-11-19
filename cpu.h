@@ -52,7 +52,7 @@ struct CPU
     LDA_INX  = 0xA1,
     LDA_INY  = 0xB1;
 
-  void reset(Memory& module);
+  void reset();
   Byte fetch_byte(Memory& module, u32 cycles);
   void reg_cmp(Byte operand, Byte reg);
   void exe(Memory& module, u32 cycles);
