@@ -9,3 +9,7 @@ Makefile
 /CMakeFiles
 
 /cpu.dSYM
+/build
+
+6502_emulator
+

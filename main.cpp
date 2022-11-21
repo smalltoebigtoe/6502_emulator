@@ -3,8 +3,6 @@
 #include <vector>
 #include <stdexcept>
 
-#include "memory.h"
-#include "cpu.h"
 #include "data.h"
 #include "machine_6502.h"
 
@@ -27,13 +25,19 @@ std::vector<Byte> read_bin(const char* bin_instr)
     return fileData;
 }
 
+void useless(Byte a=0x0, Byte b=0x0, Byte c=0x0, Byte d=0x0, Byte e=0x0) {;};
+
+//#include "debug.h"
+
 int main()
 {
-  // std::vector<Byte> binary_instructions = read_bin(BIN_INSTRUCTION_FILE_PATH);
+  Machine_6502 machine;
+  std::vector<Byte> binary_instructions =
+    {machine.get_cpu().CMP_IM, machine.get_cpu().CMP_IM};  // 0xC9
 
-  CPU CPU;
-  Memory RAM;
-  Machine_6502 machine(CPU, RAM);
+  machine.load(binary_instructions, 0);
+
+  machine.run();
 
   return 0;
 }

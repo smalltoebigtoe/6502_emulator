@@ -1,6 +1,8 @@
 #ifndef CPU_H
 #define CPU_H
 
+#include <iostream>
+
 #include "memory.h"
 
 struct CPU
@@ -53,10 +55,11 @@ struct CPU
     LDA_INY  = 0xB1;
 
   void reset();
-  Byte fetch_byte(Memory& module, u32 cycles);
   void reg_cmp(Byte operand, Byte reg);
-  void exe(Memory& module, u32 cycles);
+  Byte fetch_instruction(Memory& module);
+  void execute(Memory& module);
   void CMP();
+
 };
 
 #endif

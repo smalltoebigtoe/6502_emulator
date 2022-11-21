@@ -1,5 +1,7 @@
 #include "cpu.h"
 
+#include "debug.h"
+
 void CPU::reset() {
   PC = 0xFFFC;
   SP = 0x0100;
@@ -7,26 +9,25 @@ void CPU::reset() {
   A = X = Y = 0x0;
 }
 
-Byte CPU::fetch_byte(Memory& module, u32 cycles) {
-  Byte data = module.data[PC];
-  PC++;
-  cycles--;
-  return data;
-}
-
 void CPU::reg_cmp(Byte operand, Byte reg) {
   ;
 }
 
-void CPU::exe(Memory& module, u32 cycles) {
-  while (cycles > 0) {
-    Byte instr = fetch_byte(module, cycles);
-    switch (instr) {
-      case (LDA_IM):
-        Byte operand = fetch_byte(module, cycles);
-        reg_cmp(operand, A);
-        break;
-    }
-    cycles--;
-  }
+/* IMPORTANT:
+    Can't increase PC after returning, so PC-1, but real PC is at correct value */
+Byte CPU::fetch_instruction(Memory& module) {
+  PC++;
+  std::cout << "Instruction @ PC[" << PC-1 << "]" << " -> ";
+  print_Byte(module.data[PC-1]);
+
+  return module.data[PC-1];
+}
+
+// one cycle of instruction
+void CPU::execute(Memory& module) {
+  Byte instruction = fetch_instruction(module);
+  if (instruction == 0xC9)
+    reg_cmp(instruction, A);
+  else
+    throw std::runtime_error("instruction not recognized");
 }
