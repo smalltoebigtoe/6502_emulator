@@ -17,6 +17,7 @@ std::string int_to_hex( T i )
   return stream.str();
 }
 
+/*
 void print_Byte(unsigned char byte, const char* name=NULL) {
   if (name != NULL) 
     std::cout << name << " -> " << std::bitset<8>(byte) << " -> " <<
@@ -24,5 +25,5 @@ void print_Byte(unsigned char byte, const char* name=NULL) {
   else
     std::cout << std::bitset<8>(byte) << " -> " << int_to_hex((int)byte) << '\n';
 }
-
+*/
 #endif

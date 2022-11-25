@@ -12,7 +12,7 @@ project(6502_emulator VERSION 0.1
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-add_compile_options(-g -O0 -Wall -Werror)
+add_compile_options(-g -O0 -Wall -Werror -std=c++1z)
 set(CPP_FILES "main.cpp;cpu.cpp;memory.cpp;machine_6502.cpp")
 
 include_directories(${PROJECT_SOURCE_DIR})

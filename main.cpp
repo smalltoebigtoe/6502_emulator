@@ -25,19 +25,14 @@ std::vector<Byte> read_bin(const char* bin_instr)
     return fileData;
 }
 
-void useless(Byte a=0x0, Byte b=0x0, Byte c=0x0, Byte d=0x0, Byte e=0x0) {;};
-
-//#include "debug.h"
-
 int main()
 {
   Machine_6502 machine;
   std::vector<Byte> binary_instructions =
-    {machine.get_cpu().CMP_IM, machine.get_cpu().CMP_IM};  // 0xC9
+    {machine.get_cpu().CMP_IM, 0x00};
 
   machine.load(binary_instructions, 0);
-
-  machine.run();
+  machine.execute(machine);
 
   return 0;
 }
