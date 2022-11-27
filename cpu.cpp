@@ -12,7 +12,6 @@ void CPU::reset() {
 Byte CPU::fetch_instruction(Memory& module) {
   PC++;
   std::cout << "Instruction @ PC[" << PC-1 << "]" << " -> ";
-  //print_Byte(module.data[PC-1]);
 
   return module.data[PC-1];
 }

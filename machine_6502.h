@@ -9,7 +9,6 @@
 #include "cpu.h"
 #include "memory.h"
 #include "data.h"
-#include "debug.h"
 
 class Machine_6502 {
   private:
@@ -35,7 +34,6 @@ class Machine_6502 {
 
     uint8_t get_zpg_address();
     uint8_t get_zpgx_address();
-    uint8_t get_zpgy_address();
 
     uint16_t get_abs_address();
     uint16_t get_absx_address();

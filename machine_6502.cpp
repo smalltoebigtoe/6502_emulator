@@ -9,7 +9,6 @@ Machine_6502::Machine_6502()
   m_cpu = &cpu;
   m_module = &memory;
   init_handlers();
-  std::cout << "6502 machine created..." << '\n';
 }
 
 using namespace std::placeholders;
@@ -48,6 +47,7 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0xD1, cmp_iny));
 }
 
+#include "debug.h"
 void Machine_6502::cmp(CPU& cpu, Byte reg_val, Byte value) {
   Byte result = reg_val - value;
   cpu.CF = false;
@@ -63,19 +63,19 @@ void Machine_6502::cmp(CPU& cpu, Byte reg_val, Byte value) {
 void Machine_6502::cmp_im(Machine_6502& machine) {
   cmp(machine.get_cpu(), machine.get_cpu().A, machine.read_program_byte()); }
 void Machine_6502::cmp_zp(Machine_6502& machine) { /* zpg*/
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().data[get_zpg_address()]); }
+  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_zpg_address())); }
 void Machine_6502::cmp_zpx(Machine_6502& machine) { /* zpgx*/
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().data[get_zpgx_address()]); }
+  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_zpgx_address())); }
 void Machine_6502::cmp_abs(Machine_6502& machine) { /* abs*/
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().data[get_abs_address()]); }
+  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_abs_address())); }
 void Machine_6502::cmp_absx(Machine_6502& machine) { /* absx*/
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().data[get_absx_address()]); }
+  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_absx_address())); }
 void Machine_6502::cmp_absy(Machine_6502& machine) { /* absy*/
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().data[get_absy_address()]); }
+  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_absy_address())); }
 void Machine_6502::cmp_inx(Machine_6502& machine) { /* indx */
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().data[get_indx_address()]); }
+  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_indx_address())); }
 void Machine_6502::cmp_iny(Machine_6502& machine) { /* indy*/
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().data[get_indy_address()]); }
+  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_indy_address())); }
 
 uint8_t Machine_6502::get_zpg_address() {
   return read_program_byte();
@@ -84,11 +84,6 @@ uint8_t Machine_6502::get_zpg_address() {
 uint8_t Machine_6502::get_zpgx_address() {
     // expect wrap around
     return read_program_byte() + m_cpu->X;
-}
-
-uint8_t Machine_6502::get_zpgy_address() {
-    // expect wrap around
-    return read_program_byte() + m_cpu->Y;
 }
 
 uint16_t Machine_6502::get_abs_address() {
@@ -120,7 +115,6 @@ uint16_t Machine_6502::get_ind_address() {
     auto low = m_module->data[paddress];
     auto high = m_module->data[paddress + 1];
     uint16_t address = (high << 8) + low;
-
     return address;
 }
 
@@ -138,7 +132,6 @@ uint16_t Machine_6502::get_indy_address() {
     auto high = m_module->data[offset + 1];
     auto y = m_cpu->Y;
     uint16_t address = (high << 8) + low + y;
-
     return address;
 }
 
@@ -161,12 +154,10 @@ void Machine_6502::load(const std::vector<Byte> instructions, Word address) {
     m_module->data[address+i] = instructions.at(i);
   }
   m_cpu->PC = address;
-  std::cout << "instructions with size " << instructions.size() << " loaded at " << address << '\n';
 }
 
 bool Machine_6502::is_eop() {
-  bool yup = (m_cpu->PC >= (m_instruction_address + m_instruction_size));
-  return yup;
+  return (m_cpu->PC >= (m_instruction_address + m_instruction_size));
 }
 
 void Machine_6502::execute(Machine_6502& machine) {
@@ -176,7 +167,6 @@ void Machine_6502::execute(Machine_6502& machine) {
     if (Fn == handlers.end())
       throw std::runtime_error("Tried executing a nonexistent opcode.");
     Fn->second(machine);
-    std::cout << "executed a fn.\n";
   }
 }
 
@@ -193,6 +183,4 @@ void Machine_6502::reset() {
   m_module->reset();
   m_instruction_address = 0;
   m_instruction_size = 0;
-
-  std::cout << "6502 machine restarted." << '\n';
 }

@@ -18,13 +18,13 @@ struct Memory
   static const int MAX = 65535;
   Byte data[MAX];
 
-  uint16_t get_page_offset(uint16_t page);
+  uint16_t get_page_offset(uint8_t page);
 
   void set_at(uint16_t address, Byte input);
   Byte get_at(uint16_t address);
 
-  void set_at_page(uint16_t page, Byte offset, Byte input);
-  Byte get_at_page(uint16_t page, Byte offset);
+  void set_at_page(uint8_t page, Byte offset, Byte input);
+  Byte get_at_page(uint8_t page, Byte offset);
 
   void reset();
 };

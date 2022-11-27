@@ -27,12 +27,5 @@ std::vector<Byte> read_bin(const char* bin_instr)
 
 int main()
 {
-  Machine_6502 machine;
-  std::vector<Byte> binary_instructions =
-    {machine.get_cpu().CMP_IM, 0x00};
-
-  machine.load(binary_instructions, 0);
-  machine.execute(machine);
-
   return 0;
 }

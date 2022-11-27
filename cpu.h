@@ -4,7 +4,6 @@
 #include <iostream>
 
 #include "memory.h"
-#include "debug.h"
 
 struct CPU
 {
