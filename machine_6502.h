@@ -32,19 +32,18 @@ class Machine_6502 {
     void reset();
     bool is_eop();
 
-    uint8_t get_zpg_address();
-    uint8_t get_zpgx_address();
-
-    uint16_t get_abs_address();
-    uint16_t get_absx_address();
-    uint16_t get_absy_address();
-
-    uint16_t get_ind_address();
-    uint16_t get_indx_address();
-    uint16_t get_indy_address();
+    void lda(CPU& cpu, Byte value);
+    void lda_imm(Machine_6502& machine);
+    void lda_zp(Machine_6502& machine);
+    void lda_zpx(Machine_6502& machine);
+    void lda_abs(Machine_6502& machine);
+    void lda_absx(Machine_6502& machine);
+    void lda_absy(Machine_6502& machine);
+    void lda_inx(Machine_6502& machine);
+    void lda_iny(Machine_6502& machine);
 
     void cmp(CPU& cpu, Byte reg, Byte value);
-    void cmp_im(Machine_6502& machine);
+    void cmp_imm(Machine_6502& machine);
     void cmp_zp(Machine_6502& machine);
     void cmp_zpx(Machine_6502& machine);
     void cmp_abs(Machine_6502& machine);
@@ -52,6 +51,15 @@ class Machine_6502 {
     void cmp_absy(Machine_6502& machine);
     void cmp_inx(Machine_6502& machine);
     void cmp_iny(Machine_6502& machine);
+
+    uint8_t get_zpg_address();
+    uint8_t get_zpgx_address();
+    uint16_t get_abs_address();
+    uint16_t get_absx_address();
+    uint16_t get_absy_address();
+    uint16_t get_ind_address();
+    uint16_t get_indx_address();
+    uint16_t get_indy_address();
 };
 
 #endif

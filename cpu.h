@@ -21,9 +21,8 @@ struct CPU
   bool OFF;  // overflow flag
   bool NF;   // negative flag
 
-  /* instructions */
   static constexpr Byte
-    CMP_IM = 0xC9,
+    CMP_IMM = 0xC9,
     CMP_ZP = 0xC5,
     CMP_ZPX = 0xD5,
     CMP_ABS = 0xCD,
@@ -32,9 +31,8 @@ struct CPU
     CMP_INX = 0xC1,
     CMP_INY = 0xD1;
 
-  /* opcodes */
   static constexpr Byte
-    LDA_IM   = 0xA9,
+    LDA_IMM   = 0xA9,
     LDA_ZP   = 0xA5,
     LDA_ZPX  = 0xB5,
     LDA_ABS  = 0xAD,

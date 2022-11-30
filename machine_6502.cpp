@@ -1,5 +1,7 @@
 #include "machine_6502.h"
 
+#include "debug.h"
+
 Machine_6502::Machine_6502()
   : m_instruction_address{ 0 }, m_instruction_size{ 0 } {
   CPU cpu;
@@ -13,31 +15,50 @@ Machine_6502::Machine_6502()
 
 using namespace std::placeholders;
 void Machine_6502::init_handlers() {
-  std::function<void(Machine_6502& machine)> cmp_im =
-    std::bind(&Machine_6502::cmp_im, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> lda_imm =
+    std::bind(&Machine_6502::lda_imm, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> lda_zp =
+    std::bind(&Machine_6502::lda_zp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> lda_zpx =
+    std::bind(&Machine_6502::lda_zpx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> lda_abs =
+    std::bind(&Machine_6502::lda_abs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> lda_absx =
+    std::bind(&Machine_6502::lda_absx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> lda_absy =
+    std::bind(&Machine_6502::lda_absy, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> lda_inx =
+    std::bind(&Machine_6502::lda_inx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> lda_iny =
+    std::bind(&Machine_6502::lda_iny, this, std::placeholders::_1);
 
+  std::function<void(Machine_6502& machine)> cmp_imm =
+    std::bind(&Machine_6502::cmp_imm, this, std::placeholders::_1);
   std::function<void(Machine_6502& machine)> cmp_zp =
     std::bind(&Machine_6502::cmp_zp, this, std::placeholders::_1);
-
   std::function<void(Machine_6502& machine)> cmp_zpx =
     std::bind(&Machine_6502::cmp_zpx, this, std::placeholders::_1);
-
   std::function<void(Machine_6502& machine)> cmp_abs =
     std::bind(&Machine_6502::cmp_abs, this, std::placeholders::_1);
-
   std::function<void(Machine_6502& machine)> cmp_absx =
     std::bind(&Machine_6502::cmp_absx, this, std::placeholders::_1);
-
   std::function<void(Machine_6502& machine)> cmp_absy =
     std::bind(&Machine_6502::cmp_absy, this, std::placeholders::_1);
-
   std::function<void(Machine_6502& machine)> cmp_inx =
     std::bind(&Machine_6502::cmp_inx, this, std::placeholders::_1);
-
   std::function<void(Machine_6502& machine)> cmp_iny =
     std::bind(&Machine_6502::cmp_iny, this, std::placeholders::_1);
 
-  handlers.insert(std::make_pair(0xC9, cmp_im));
+  handlers.insert(std::make_pair(0xA9, lda_imm));
+  handlers.insert(std::make_pair(0xA5, lda_zp));
+  handlers.insert(std::make_pair(0xB5, lda_zpx));
+  handlers.insert(std::make_pair(0xAD, lda_abs));
+  handlers.insert(std::make_pair(0xBD, lda_absx));
+  handlers.insert(std::make_pair(0xB9, lda_absy));
+  handlers.insert(std::make_pair(0xA1, lda_inx));
+  handlers.insert(std::make_pair(0xB1, lda_iny));
+
+  handlers.insert(std::make_pair(0xC9, cmp_imm));
   handlers.insert(std::make_pair(0xC5, cmp_zp));
   handlers.insert(std::make_pair(0xD5, cmp_zpx));
   handlers.insert(std::make_pair(0xCD, cmp_abs));
@@ -47,7 +68,28 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0xD1, cmp_iny));
 }
 
-#include "debug.h"
+void Machine_6502::lda(CPU& cpu, Byte value) {
+  cpu.A = value;
+  cpu.NF = ((value & 0x80) == 0x80);
+  cpu.ZF = (value == 0);
+}
+void Machine_6502::lda_imm(Machine_6502& machine) {
+  lda(machine.get_cpu(), machine.read_program_byte()); }
+void Machine_6502::lda_zp(Machine_6502& machine) {
+  lda(machine.get_cpu(), machine.get_module().get_at(get_zpg_address())); }
+void Machine_6502::lda_zpx(Machine_6502& machine) {
+  lda(machine.get_cpu(), machine.get_module().get_at(get_zpgx_address())); }
+void Machine_6502::lda_abs(Machine_6502& machine) {
+  lda(machine.get_cpu(), machine.get_module().get_at(get_abs_address())); }
+void Machine_6502::lda_absx(Machine_6502& machine) {
+  lda(machine.get_cpu(), machine.get_module().get_at(get_absx_address())); }
+void Machine_6502::lda_absy(Machine_6502& machine) {
+  lda(machine.get_cpu(), machine.get_module().get_at(get_absy_address())); }
+void Machine_6502::lda_inx(Machine_6502& machine) {
+  lda(machine.get_cpu(), machine.get_module().get_at(get_indx_address())); }
+void Machine_6502::lda_iny(Machine_6502& machine) {
+  lda(machine.get_cpu(), machine.get_module().get_at(get_indy_address())); }
+
 void Machine_6502::cmp(CPU& cpu, Byte reg_val, Byte value) {
   Byte result = reg_val - value;
   cpu.CF = false;
@@ -59,23 +101,72 @@ void Machine_6502::cmp(CPU& cpu, Byte reg_val, Byte value) {
   if ((result & 0x80) == 0x80)
     cpu.NF = true;
 }
-
-void Machine_6502::cmp_im(Machine_6502& machine) {
+void Machine_6502::cmp_imm(Machine_6502& machine) {
   cmp(machine.get_cpu(), machine.get_cpu().A, machine.read_program_byte()); }
-void Machine_6502::cmp_zp(Machine_6502& machine) { /* zpg*/
+void Machine_6502::cmp_zp(Machine_6502& machine) {
   cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_zpg_address())); }
-void Machine_6502::cmp_zpx(Machine_6502& machine) { /* zpgx*/
+void Machine_6502::cmp_zpx(Machine_6502& machine) {
   cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_zpgx_address())); }
-void Machine_6502::cmp_abs(Machine_6502& machine) { /* abs*/
+void Machine_6502::cmp_abs(Machine_6502& machine) {
   cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_abs_address())); }
-void Machine_6502::cmp_absx(Machine_6502& machine) { /* absx*/
+void Machine_6502::cmp_absx(Machine_6502& machine) {
   cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_absx_address())); }
-void Machine_6502::cmp_absy(Machine_6502& machine) { /* absy*/
+void Machine_6502::cmp_absy(Machine_6502& machine) {
   cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_absy_address())); }
-void Machine_6502::cmp_inx(Machine_6502& machine) { /* indx */
+void Machine_6502::cmp_inx(Machine_6502& machine) {
   cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_indx_address())); }
-void Machine_6502::cmp_iny(Machine_6502& machine) { /* indy*/
+void Machine_6502::cmp_iny(Machine_6502& machine) {
   cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_indy_address())); }
+
+CPU& Machine_6502::get_cpu() {
+  return *m_cpu;
+}
+
+Memory& Machine_6502::get_module() {
+  return *m_module;
+}
+
+void Machine_6502::load(const std::vector<Byte> instructions, Word address) {
+  m_instruction_address = address;
+  m_instruction_size = instructions.size();
+
+  if (m_instruction_size > m_module->MAX)
+    throw std::runtime_error("Instructions too large to fit in memory");
+
+  for (auto i = 0; i < instructions.size(); i++) {
+    m_module->data[address+i] = instructions.at(i);
+  }
+  m_cpu->PC = address;
+}
+
+bool Machine_6502::is_eop() {
+  return (m_cpu->PC >= (m_instruction_address + m_instruction_size));
+}
+
+void Machine_6502::execute(Machine_6502& machine) {
+  while (!is_eop()) {
+    auto byte = read_program_byte();
+    auto Fn = handlers.find(byte);
+    if (Fn == handlers.end())
+      throw std::runtime_error("Tried executing a nonexistent opcode.");
+    Fn->second(machine);
+  }
+}
+
+Byte Machine_6502::read_program_byte() {
+  if (is_eop())
+    throw std::runtime_error("passed end of program.");
+  Byte byte = m_module->data[m_cpu->PC];
+  m_cpu->PC++;
+  return byte;
+}
+
+void Machine_6502::reset() {
+  m_cpu->reset();
+  m_module->reset();
+  m_instruction_address = 0;
+  m_instruction_size = 0;
+}
 
 uint8_t Machine_6502::get_zpg_address() {
   return read_program_byte();
@@ -133,54 +224,4 @@ uint16_t Machine_6502::get_indy_address() {
     auto y = m_cpu->Y;
     uint16_t address = (high << 8) + low + y;
     return address;
-}
-
-CPU& Machine_6502::get_cpu() {
-  return *m_cpu;
-}
-
-Memory& Machine_6502::get_module() {
-  return *m_module;
-}
-
-void Machine_6502::load(const std::vector<Byte> instructions, Word address) {
-  m_instruction_address = address;
-  m_instruction_size = instructions.size();
-
-  if (m_instruction_size > m_module->MAX)
-    throw std::runtime_error("Instructions too large to fit in memory");
-
-  for (auto i = 0; i < instructions.size(); i++) {
-    m_module->data[address+i] = instructions.at(i);
-  }
-  m_cpu->PC = address;
-}
-
-bool Machine_6502::is_eop() {
-  return (m_cpu->PC >= (m_instruction_address + m_instruction_size));
-}
-
-void Machine_6502::execute(Machine_6502& machine) {
-  while (!is_eop()) {
-    auto byte = read_program_byte();
-    auto Fn = handlers.find(byte);
-    if (Fn == handlers.end())
-      throw std::runtime_error("Tried executing a nonexistent opcode.");
-    Fn->second(machine);
-  }
-}
-
-Byte Machine_6502::read_program_byte() {
-  if (is_eop())
-    throw std::runtime_error("passed end of program.");
-  Byte byte = m_module->data[m_cpu->PC];
-  m_cpu->PC++;
-  return byte;
-}
-
-void Machine_6502::reset() {
-  m_cpu->reset();
-  m_module->reset();
-  m_instruction_address = 0;
-  m_instruction_size = 0;
 }
