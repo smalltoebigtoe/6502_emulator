@@ -32,6 +32,28 @@ void Machine_6502::init_handlers() {
   std::function<void(Machine_6502& machine)> lda_iny =
     std::bind(&Machine_6502::lda_iny, this, std::placeholders::_1);
 
+  std::function<void(Machine_6502& machine)> ldx_imm =
+    std::bind(&Machine_6502::ldx_imm, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ldx_zp =
+    std::bind(&Machine_6502::ldx_zp, this, std::placeholders::_1);
+   std::function<void(Machine_6502& machine)> ldx_zpy =
+    std::bind(&Machine_6502::ldx_zpy, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ldx_abs =
+    std::bind(&Machine_6502::ldx_abs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ldx_absy =
+    std::bind(&Machine_6502::ldx_absy, this, std::placeholders::_1);
+
+  std::function<void(Machine_6502& machine)> ldy_imm =
+    std::bind(&Machine_6502::ldy_imm, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ldy_zp =
+    std::bind(&Machine_6502::ldy_zp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ldy_zpx =
+    std::bind(&Machine_6502::ldy_zpx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ldy_abs =
+    std::bind(&Machine_6502::ldy_abs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ldy_absx =
+    std::bind(&Machine_6502::ldy_absx, this, std::placeholders::_1);
+
   std::function<void(Machine_6502& machine)> cmp_imm =
     std::bind(&Machine_6502::cmp_imm, this, std::placeholders::_1);
   std::function<void(Machine_6502& machine)> cmp_zp =
@@ -57,6 +79,18 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0xB9, lda_absy));
   handlers.insert(std::make_pair(0xA1, lda_inx));
   handlers.insert(std::make_pair(0xB1, lda_iny));
+
+  handlers.insert(std::make_pair(0xA2, ldx_imm));
+  handlers.insert(std::make_pair(0xA6, ldx_zp));
+  handlers.insert(std::make_pair(0xB6, ldx_zpy));
+  handlers.insert(std::make_pair(0xAE, ldx_abs));
+  handlers.insert(std::make_pair(0xBE, ldx_absy));
+
+  handlers.insert(std::make_pair(0xA0, ldy_imm));
+  handlers.insert(std::make_pair(0xA4, ldy_zp));
+  handlers.insert(std::make_pair(0xB4, ldy_zpx));
+  handlers.insert(std::make_pair(0xAC, ldy_abs));
+  handlers.insert(std::make_pair(0xBC, ldy_absx));
 
   handlers.insert(std::make_pair(0xC9, cmp_imm));
   handlers.insert(std::make_pair(0xC5, cmp_zp));
@@ -89,6 +123,38 @@ void Machine_6502::lda_inx(Machine_6502& machine) {
   lda(machine.get_cpu(), machine.get_module().get_at(get_indx_address())); }
 void Machine_6502::lda_iny(Machine_6502& machine) {
   lda(machine.get_cpu(), machine.get_module().get_at(get_indy_address())); }
+
+void Machine_6502::ldx(CPU& cpu, Byte value) {
+  cpu.X = value;
+  cpu.NF = ((value & 0x80) == 0x80);
+  cpu.ZF = (value == 0);
+}
+void Machine_6502::ldx_imm(Machine_6502& machine) {
+  ldx(machine.get_cpu(), machine.read_program_byte()); }
+void Machine_6502::ldx_zp(Machine_6502& machine) {
+  ldx(machine.get_cpu(), machine.get_module().get_at(get_zpg_address())); }
+void Machine_6502::ldx_zpy(Machine_6502& machine) {
+  ldx(machine.get_cpu(), machine.get_module().get_at(get_zpgy_address())); }
+void Machine_6502::ldx_abs(Machine_6502& machine) {
+  ldx(machine.get_cpu(), machine.get_module().get_at(get_abs_address())); }
+void Machine_6502::ldx_absy(Machine_6502& machine) {
+  ldx(machine.get_cpu(), machine.get_module().get_at(get_absy_address())); }
+
+void Machine_6502::ldy(CPU& cpu, Byte value) {
+  cpu.Y = value;
+  cpu.NF = ((value & 0x80) == 0x80);
+  cpu.ZF = (value == 0);
+}
+void Machine_6502::ldy_imm(Machine_6502& machine) {
+  ldy(machine.get_cpu(), machine.read_program_byte()); }
+void Machine_6502::ldy_zp(Machine_6502& machine) {
+  ldy(machine.get_cpu(), machine.get_module().get_at(get_zpg_address())); }
+void Machine_6502::ldy_zpx(Machine_6502& machine) {
+  ldy(machine.get_cpu(), machine.get_module().get_at(get_zpgx_address())); }
+void Machine_6502::ldy_abs(Machine_6502& machine) {
+  ldy(machine.get_cpu(), machine.get_module().get_at(get_abs_address())); }
+void Machine_6502::ldy_absx(Machine_6502& machine) {
+  ldy(machine.get_cpu(), machine.get_module().get_at(get_absx_address())); }
 
 void Machine_6502::cmp(CPU& cpu, Byte reg_val, Byte value) {
   Byte result = reg_val - value;
@@ -173,8 +239,11 @@ uint8_t Machine_6502::get_zpg_address() {
 }
 
 uint8_t Machine_6502::get_zpgx_address() {
-    // expect wrap around
     return read_program_byte() + m_cpu->X;
+}
+
+uint8_t Machine_6502::get_zpgy_address() {
+  return read_program_byte() + m_cpu->Y;
 }
 
 uint16_t Machine_6502::get_abs_address() {

@@ -42,6 +42,20 @@ class Machine_6502 {
     void lda_inx(Machine_6502& machine);
     void lda_iny(Machine_6502& machine);
 
+    void ldx(CPU& cpu, Byte value);
+    void ldx_imm(Machine_6502& machine);
+    void ldx_zp(Machine_6502& machine);
+    void ldx_zpy(Machine_6502& machine);
+    void ldx_abs(Machine_6502& machine);
+    void ldx_absy(Machine_6502& machine);
+
+    void ldy(CPU& cpu, Byte value);
+    void ldy_imm(Machine_6502& machine);
+    void ldy_zp(Machine_6502& machine);
+    void ldy_zpx(Machine_6502& machine);
+    void ldy_abs(Machine_6502& machine);
+    void ldy_absx(Machine_6502& machine);
+
     void cmp(CPU& cpu, Byte reg, Byte value);
     void cmp_imm(Machine_6502& machine);
     void cmp_zp(Machine_6502& machine);
@@ -54,6 +68,7 @@ class Machine_6502 {
 
     uint8_t get_zpg_address();
     uint8_t get_zpgx_address();
+    uint8_t get_zpgy_address();
     uint16_t get_abs_address();
     uint16_t get_absx_address();
     uint16_t get_absy_address();
