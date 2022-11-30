@@ -32,6 +32,36 @@ class Machine_6502 {
     void reset();
     bool is_eop();
 
+    void _and(CPU& cpu, Byte value);
+    void and_imm(Machine_6502& machine);
+    void and_zp(Machine_6502& machine);
+    void and_zpx(Machine_6502& machine);
+    void and_abs(Machine_6502& machine);
+    void and_absx(Machine_6502& machine);
+    void and_absy(Machine_6502& machine);
+    void and_inx(Machine_6502& machine);
+    void and_iny(Machine_6502& machine);
+
+    void eor(CPU& cpu, Byte value);
+    void eor_imm(Machine_6502& machine);
+    void eor_zp(Machine_6502& machine);
+    void eor_zpx(Machine_6502& machine);
+    void eor_abs(Machine_6502& machine);
+    void eor_absx(Machine_6502& machine);
+    void eor_absy(Machine_6502& machine);
+    void eor_inx(Machine_6502& machine);
+    void eor_iny(Machine_6502& machine);
+
+    void ora(CPU& cpu, Byte value);
+    void ora_imm(Machine_6502& machine);
+    void ora_zp(Machine_6502& machine);
+    void ora_zpx(Machine_6502& machine);
+    void ora_abs(Machine_6502& machine);
+    void ora_absx(Machine_6502& machine);
+    void ora_absy(Machine_6502& machine);
+    void ora_inx(Machine_6502& machine);
+    void ora_iny(Machine_6502& machine);
+
     void lda(CPU& cpu, Byte value);
     void lda_imm(Machine_6502& machine);
     void lda_zp(Machine_6502& machine);

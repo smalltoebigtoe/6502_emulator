@@ -15,6 +15,57 @@ Machine_6502::Machine_6502()
 
 using namespace std::placeholders;
 void Machine_6502::init_handlers() {
+  std::function<void(Machine_6502& machine)> and_imm =
+    std::bind(&Machine_6502::and_imm, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> and_zp =
+    std::bind(&Machine_6502::and_zp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> and_zpx =
+    std::bind(&Machine_6502::and_zpx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> and_abs =
+    std::bind(&Machine_6502::and_abs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> and_absx =
+    std::bind(&Machine_6502::and_absx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> and_absy =
+    std::bind(&Machine_6502::and_absy, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> and_inx =
+    std::bind(&Machine_6502::and_inx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> and_iny =
+    std::bind(&Machine_6502::and_iny, this, std::placeholders::_1);
+
+  std::function<void(Machine_6502& machine)> eor_imm =
+    std::bind(&Machine_6502::eor_imm, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> eor_zp =
+    std::bind(&Machine_6502::eor_zp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> eor_zpx =
+    std::bind(&Machine_6502::eor_zpx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> eor_abs =
+    std::bind(&Machine_6502::eor_abs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> eor_absx =
+    std::bind(&Machine_6502::eor_absx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> eor_absy =
+    std::bind(&Machine_6502::eor_absy, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> eor_inx =
+    std::bind(&Machine_6502::eor_inx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> eor_iny =
+    std::bind(&Machine_6502::eor_iny, this, std::placeholders::_1);
+
+  std::function<void(Machine_6502& machine)> ora_imm =
+    std::bind(&Machine_6502::ora_imm, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ora_zp =
+    std::bind(&Machine_6502::ora_zp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ora_zpx =
+      std::bind(&Machine_6502::ora_zpx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ora_abs =
+      std::bind(&Machine_6502::ora_abs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ora_absx =
+      std::bind(&Machine_6502::ora_absx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ora_absy =
+      std::bind(&Machine_6502::ora_absy, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ora_inx =
+      std::bind(&Machine_6502::ora_inx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> ora_iny =
+      std::bind(&Machine_6502::ora_iny, this, std::placeholders::_1);
+
   std::function<void(Machine_6502& machine)> lda_imm =
     std::bind(&Machine_6502::lda_imm, this, std::placeholders::_1);
   std::function<void(Machine_6502& machine)> lda_zp =
@@ -71,6 +122,33 @@ void Machine_6502::init_handlers() {
   std::function<void(Machine_6502& machine)> cmp_iny =
     std::bind(&Machine_6502::cmp_iny, this, std::placeholders::_1);
 
+  handlers.insert(std::make_pair(0x29, and_imm));
+  handlers.insert(std::make_pair(0x25, and_zp));
+  handlers.insert(std::make_pair(0x35, and_zpx));
+  handlers.insert(std::make_pair(0x2D, and_abs));
+  handlers.insert(std::make_pair(0x3D, and_absx));
+  handlers.insert(std::make_pair(0x39, and_absy));
+  handlers.insert(std::make_pair(0x21, and_inx));
+  handlers.insert(std::make_pair(0x31, and_iny));
+
+  handlers.insert(std::make_pair(0x49, eor_imm));
+  handlers.insert(std::make_pair(0x45, eor_zp));
+  handlers.insert(std::make_pair(0x55, eor_zpx));
+  handlers.insert(std::make_pair(0x4D, eor_abs));
+  handlers.insert(std::make_pair(0x5D, eor_absx));
+  handlers.insert(std::make_pair(0x59, eor_absy));
+  handlers.insert(std::make_pair(0x41, eor_inx));
+  handlers.insert(std::make_pair(0x51, eor_iny));
+
+  handlers.insert(std::make_pair(0x09, ora_imm));
+  handlers.insert(std::make_pair(0x05, ora_zp));
+  handlers.insert(std::make_pair(0x15, ora_zpx));
+  handlers.insert(std::make_pair(0x0D, ora_abs));
+  handlers.insert(std::make_pair(0x1D, ora_absx));
+  handlers.insert(std::make_pair(0x19, ora_absy));
+  handlers.insert(std::make_pair(0x01, ora_inx));
+  handlers.insert(std::make_pair(0x11, ora_iny));
+
   handlers.insert(std::make_pair(0xA9, lda_imm));
   handlers.insert(std::make_pair(0xA5, lda_zp));
   handlers.insert(std::make_pair(0xB5, lda_zpx));
@@ -101,6 +179,71 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0xC1, cmp_inx));
   handlers.insert(std::make_pair(0xD1, cmp_iny));
 }
+void Machine_6502::_and(CPU& cpu, Byte value) {
+  Byte result = (cpu.A & value);
+  // set flags N, Z -- TODO
+  cpu.A = result;
+}
+void Machine_6502::and_imm(Machine_6502& machine) {
+  _and(machine.get_cpu(), machine.get_module().get_at(machine.read_program_byte())); }
+void Machine_6502::and_zp(Machine_6502& machine) {
+  _and(machine.get_cpu(), machine.get_module().get_at(machine.get_zpg_address())); }
+void Machine_6502::and_zpx(Machine_6502& machine) {
+  _and(machine.get_cpu(), machine.get_module().get_at(machine.get_zpgx_address())); }
+void Machine_6502::and_abs(Machine_6502& machine) {
+  _and(machine.get_cpu(), machine.get_module().get_at(machine.get_absx_address())); }
+void Machine_6502::and_absx(Machine_6502& machine) {
+  _and(machine.get_cpu(), machine.get_module().get_at(machine.get_absy_address())); }
+void Machine_6502::and_absy(Machine_6502& machine) {
+  _and(machine.get_cpu(), machine.get_module().get_at(machine.get_indx_address())); }
+void Machine_6502::and_inx(Machine_6502& machine) {
+  _and(machine.get_cpu(), machine.get_module().get_at(machine.get_indx_address())); }
+void Machine_6502::and_iny(Machine_6502& machine) {
+  _and(machine.get_cpu(), machine.get_module().get_at(machine.get_indy_address())); }
+
+void Machine_6502::eor(CPU& cpu, Byte value) {
+  Byte result = (cpu.A ^ value);
+  // set flags N, Z -- TODO
+  cpu.A = result;
+}
+void Machine_6502::eor_imm(Machine_6502& machine) {
+  eor(machine.get_cpu(), machine.get_module().get_at(machine.read_program_byte())); }
+void Machine_6502::eor_zp(Machine_6502& machine) {
+  eor(machine.get_cpu(), machine.get_module().get_at(machine.get_zpg_address())); }
+void Machine_6502::eor_zpx(Machine_6502& machine) {
+  eor(machine.get_cpu(), machine.get_module().get_at(machine.get_zpgx_address())); }
+void Machine_6502::eor_abs(Machine_6502& machine) {
+  eor(machine.get_cpu(), machine.get_module().get_at(machine.get_absx_address())); }
+void Machine_6502::eor_absx(Machine_6502& machine) {
+  eor(machine.get_cpu(), machine.get_module().get_at(machine.get_absy_address())); }
+void Machine_6502::eor_absy(Machine_6502& machine) {
+  eor(machine.get_cpu(), machine.get_module().get_at(machine.get_indx_address())); }
+void Machine_6502::eor_inx(Machine_6502& machine) {
+  eor(machine.get_cpu(), machine.get_module().get_at(machine.get_indx_address())); }
+void Machine_6502::eor_iny(Machine_6502& machine) {
+  eor(machine.get_cpu(), machine.get_module().get_at(machine.get_indy_address())); }
+
+void Machine_6502::ora(CPU& cpu, Byte value) {
+  Byte result = (cpu.A || value);
+  // set flags N, Z -- TODO
+  cpu.A = result;
+}
+void Machine_6502::ora_imm(Machine_6502& machine) {
+  ora(machine.get_cpu(), machine.get_module().get_at(machine.read_program_byte())); }
+void Machine_6502::ora_zp(Machine_6502& machine) {
+  ora(machine.get_cpu(), machine.get_module().get_at(machine.get_zpg_address())); }
+void Machine_6502::ora_zpx(Machine_6502& machine) {
+  ora(machine.get_cpu(), machine.get_module().get_at(machine.get_zpgx_address())); }
+void Machine_6502::ora_abs(Machine_6502& machine) {
+  ora(machine.get_cpu(), machine.get_module().get_at(machine.get_absx_address())); }
+void Machine_6502::ora_absx(Machine_6502& machine) {
+  ora(machine.get_cpu(), machine.get_module().get_at(machine.get_absy_address())); }
+void Machine_6502::ora_absy(Machine_6502& machine) {
+  ora(machine.get_cpu(), machine.get_module().get_at(machine.get_indx_address())); }
+void Machine_6502::ora_inx(Machine_6502& machine) {
+  ora(machine.get_cpu(), machine.get_module().get_at(machine.get_indx_address())); }
+void Machine_6502::ora_iny(Machine_6502& machine) {
+  ora(machine.get_cpu(), machine.get_module().get_at(machine.get_indy_address())); }
 
 void Machine_6502::lda(CPU& cpu, Byte value) {
   cpu.A = value;
