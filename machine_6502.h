@@ -32,6 +32,12 @@ class Machine_6502 {
     void reset();
     bool is_eop();
 
+    void dec(CPU& cpu, Byte value);
+    void dec_zp(Machine_6502& machine);
+    void dec_zpx(Machine_6502& machine);
+    void dec_abs(Machine_6502& machine);
+    void dec_absx(Machine_6502& machine);
+
     void _and(CPU& cpu, Byte value);
     void and_imm(Machine_6502& machine);
     void and_zp(Machine_6502& machine);
