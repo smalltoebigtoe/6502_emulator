@@ -15,6 +15,23 @@ Machine_6502::Machine_6502()
 
 using namespace std::placeholders;
 void Machine_6502::init_handlers() {
+  std::function<void(Machine_6502& machine)> tax =
+    std::bind(&Machine_6502::tax, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> txa =
+    std::bind(&Machine_6502::txa, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> dex =
+    std::bind(&Machine_6502::dex, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> inx =
+    std::bind(&Machine_6502::inx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> tay =
+    std::bind(&Machine_6502::tay, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> tya =
+    std::bind(&Machine_6502::tya, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> dey =
+    std::bind(&Machine_6502::dey, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> iny =
+    std::bind(&Machine_6502::iny, this, std::placeholders::_1);
+
   std::function<void(Machine_6502& machine)> lsr_a =
     std::bind(&Machine_6502::lsr_a, this);
   std::function<void(Machine_6502& machine)> lsr_zp =
@@ -151,6 +168,15 @@ void Machine_6502::init_handlers() {
   std::function<void(Machine_6502& machine)> cmp_iny =
     std::bind(&Machine_6502::cmp_iny, this, std::placeholders::_1);
 
+  handlers.insert(std::make_pair(0xAA, tax));
+  handlers.insert(std::make_pair(0x8A, txa));
+  handlers.insert(std::make_pair(0xCA, dex));
+  handlers.insert(std::make_pair(0xE8, inx));
+  handlers.insert(std::make_pair(0xA8, tay));
+  handlers.insert(std::make_pair(0x98, tya));
+  handlers.insert(std::make_pair(0x88, dey));
+  handlers.insert(std::make_pair(0xC8, iny));
+
   handlers.insert(std::make_pair(0x4A, lsr_a));
   handlers.insert(std::make_pair(0x46, lsr_zp));
   handlers.insert(std::make_pair(0x56, lsr_zpx));
@@ -224,6 +250,23 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0xC1, cmp_inx));
   handlers.insert(std::make_pair(0xD1, cmp_iny));
 }
+
+void Machine_6502::tax(Machine_6502& machine) {
+  machine.get_cpu().X = machine.get_cpu().A; }
+void Machine_6502::txa(Machine_6502& machine) {
+  machine.get_cpu().A = machine.get_cpu().X; }
+void Machine_6502::dex(Machine_6502& machine) {
+  machine.get_cpu().X--; }
+void Machine_6502::inx(Machine_6502& machine) {
+  machine.get_cpu().X++; }
+void Machine_6502::tay(Machine_6502& machine) {
+  machine.get_cpu().Y = machine.get_cpu().A; }
+void Machine_6502::tya(Machine_6502& machine) {
+  machine.get_cpu().A = machine.get_cpu().Y; }
+void Machine_6502::dey(Machine_6502& machine) {
+  machine.get_cpu().Y--; }
+void Machine_6502::iny(Machine_6502& machine) {
+  machine.get_cpu().Y++; }
 
 void Machine_6502::lsr(uint16_t address) {
   Byte value = m_module->get_at(address);

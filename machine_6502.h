@@ -32,6 +32,15 @@ class Machine_6502 {
     void reset();
     bool is_eop();
 
+    void tax(Machine_6502& machine);
+    void txa(Machine_6502& machine);
+    void dex(Machine_6502& machine);
+    void inx(Machine_6502& machine);
+    void tay(Machine_6502& machine);
+    void tya(Machine_6502& machine);
+    void dey(Machine_6502& machine);
+    void iny(Machine_6502& machine);
+
     void lsr(uint16_t address);
     void lsr_a();
     void lsr_zp(Machine_6502& machine);
