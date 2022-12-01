@@ -32,6 +32,13 @@ class Machine_6502 {
     void reset();
     bool is_eop();
 
+    void lsr(uint16_t address);
+    void lsr_a();
+    void lsr_zp(Machine_6502& machine);
+    void lsr_zpx(Machine_6502& machine);
+    void lsr_abs(Machine_6502& machine);
+    void lsr_absx(Machine_6502& machine);
+
     void inc(uint16_t address);
     void inc_zp(Machine_6502& machine);
     void inc_zpx(Machine_6502& machine);

@@ -15,6 +15,17 @@ Machine_6502::Machine_6502()
 
 using namespace std::placeholders;
 void Machine_6502::init_handlers() {
+  std::function<void(Machine_6502& machine)> lsr_a =
+    std::bind(&Machine_6502::lsr_a, this);
+  std::function<void(Machine_6502& machine)> lsr_zp =
+    std::bind(&Machine_6502::lsr_zp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> lsr_zpx =
+    std::bind(&Machine_6502::lsr_zpx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> lsr_abs =
+    std::bind(&Machine_6502::lsr_abs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> lsr_absx =
+    std::bind(&Machine_6502::lsr_absx, this, std::placeholders::_1);
+
   std::function<void(Machine_6502& machine)> inc_zp =
     std::bind(&Machine_6502::inc_zp, this, std::placeholders::_1);
   std::function<void(Machine_6502& machine)> inc_zpx =
@@ -140,6 +151,12 @@ void Machine_6502::init_handlers() {
   std::function<void(Machine_6502& machine)> cmp_iny =
     std::bind(&Machine_6502::cmp_iny, this, std::placeholders::_1);
 
+  handlers.insert(std::make_pair(0x4A, lsr_a));
+  handlers.insert(std::make_pair(0x46, lsr_zp));
+  handlers.insert(std::make_pair(0x56, lsr_zpx));
+  handlers.insert(std::make_pair(0x4E, lsr_abs));
+  handlers.insert(std::make_pair(0x5E, lsr_absx));
+
   handlers.insert(std::make_pair(0xE6, inc_zp));
   handlers.insert(std::make_pair(0xF6, inc_zpx));
   handlers.insert(std::make_pair(0xEE, inc_abs));
@@ -207,6 +224,37 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0xC1, cmp_inx));
   handlers.insert(std::make_pair(0xD1, cmp_iny));
 }
+
+void Machine_6502::lsr(uint16_t address) {
+  Byte value = m_module->get_at(address);
+  bool shifted_out_bit = ((value & 0x01) != 0);
+  shifted_out_bit >>= 1;
+  m_cpu->CF = shifted_out_bit;
+
+  Byte result = (m_module->get_at(address) >> 1);
+  m_cpu->ZF = (result == 0);
+  m_cpu->NF = ((result & 0x80) == 0x80);
+  m_module->set_at(address, result);
+}
+void Machine_6502::lsr_a() {
+  Byte value = m_cpu->A;
+  bool shifted_out_bit = ((value & 0x01) != 0);
+  shifted_out_bit >>= 1;
+  m_cpu->CF = shifted_out_bit;
+
+  Byte result = (m_cpu->A >> 1);
+  m_cpu->ZF = (result == 0);
+  m_cpu->NF = ((result & 0x80) == 0x80);
+  m_cpu->A = result;
+}
+void Machine_6502::lsr_zp(Machine_6502& machine) {
+  lsr(machine.get_zpg_address()); }
+void Machine_6502::lsr_zpx(Machine_6502& machine) {
+  lsr(machine.get_zpg_address()); }
+void Machine_6502::lsr_abs(Machine_6502& machine) {
+  lsr(machine.get_zpg_address()); }
+void Machine_6502::lsr_absx(Machine_6502& machine) {
+  lsr(machine.get_zpg_address()); }
 
 void Machine_6502::inc(uint16_t address) {
   Byte result = m_module->get_at(address) + 1;
