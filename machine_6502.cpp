@@ -15,6 +15,15 @@ Machine_6502::Machine_6502()
 
 using namespace std::placeholders;
 void Machine_6502::init_handlers() {
+  std::function<void(Machine_6502& machine)> inc_zp =
+    std::bind(&Machine_6502::inc_zp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> inc_zpx =
+    std::bind(&Machine_6502::inc_zpx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> inc_abs =
+    std::bind(&Machine_6502::inc_abs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> inc_absx =
+    std::bind(&Machine_6502::inc_absx, this, std::placeholders::_1);
+
   std::function<void(Machine_6502& machine)> dec_zp =
     std::bind(&Machine_6502::dec_zp, this, std::placeholders::_1);
   std::function<void(Machine_6502& machine)> dec_zpx =
@@ -130,7 +139,12 @@ void Machine_6502::init_handlers() {
     std::bind(&Machine_6502::cmp_inx, this, std::placeholders::_1);
   std::function<void(Machine_6502& machine)> cmp_iny =
     std::bind(&Machine_6502::cmp_iny, this, std::placeholders::_1);
-  
+
+  handlers.insert(std::make_pair(0xE6, inc_zp));
+  handlers.insert(std::make_pair(0xF6, inc_zpx));
+  handlers.insert(std::make_pair(0xEE, inc_abs));
+  handlers.insert(std::make_pair(0xFE, inc_absx));
+
   handlers.insert(std::make_pair(0xC6, dec_zp));
   handlers.insert(std::make_pair(0xD6, dec_zpx));
   handlers.insert(std::make_pair(0xCE, dec_abs));
@@ -194,20 +208,35 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0xD1, cmp_iny));
 }
 
-void Machine_6502::dec(CPU& cpu, Byte value) {
-  Byte result = cpu.A - value;
-  cpu.ZF = (result == 0);
-  cpu.NF = ((value & 0x80) == 0x80);
-  cpu.A = result;
+void Machine_6502::inc(uint16_t address) {
+  Byte result = m_module->get_at(address) + 1;
+  m_module->set_at(address, result);
+  m_cpu->ZF = (result == 0);
+  m_cpu->NF = ((result & 0x80) == 0x80);
+}
+void Machine_6502::inc_zp(Machine_6502& machine) {
+  inc(machine.get_zpg_address()); }
+void Machine_6502::inc_zpx(Machine_6502& machine) {
+  inc(machine.get_zpgx_address()); }
+void Machine_6502::inc_abs(Machine_6502& machine) {
+  inc(machine.get_abs_address()); }
+void Machine_6502::inc_absx(Machine_6502& machine) {
+  inc(machine.get_absx_address()); }
+
+void Machine_6502::dec(uint16_t address) {
+  Byte result = m_module->get_at(address) - 1;
+  m_module->set_at(address, result);
+  m_cpu->ZF = (result == 0);
+  m_cpu->NF = ((result & 0x80) == 0x80);
 }
 void Machine_6502::dec_zp(Machine_6502& machine) {
-  dec(machine.get_cpu(), machine.get_module().get_at(machine.get_zpg_address())); }
+  dec(machine.get_zpg_address()); }
 void Machine_6502::dec_zpx(Machine_6502& machine) {
-  dec(machine.get_cpu(), machine.get_module().get_at(machine.get_zpgx_address())); }
+  dec(machine.get_zpgx_address()); }
 void Machine_6502::dec_abs(Machine_6502& machine) {
-  dec(machine.get_cpu(), machine.get_module().get_at(machine.get_abs_address())); }
+  dec(machine.get_abs_address()); }
 void Machine_6502::dec_absx(Machine_6502& machine) {
-  dec(machine.get_cpu(), machine.get_module().get_at(machine.get_absx_address())); }
+  dec(machine.get_absx_address()); }
 
 void Machine_6502::_and(CPU& cpu, Byte value) {
   Byte result = (cpu.A & value);
