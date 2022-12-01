@@ -32,22 +32,7 @@ class Machine_6502 {
     void reset();
     bool is_eop();
 
-    void tax(Machine_6502& machine);
-    void txa(Machine_6502& machine);
-    void dex(Machine_6502& machine);
-    void inx(Machine_6502& machine);
-    void tay(Machine_6502& machine);
-    void tya(Machine_6502& machine);
-    void dey(Machine_6502& machine);
-    void iny(Machine_6502& machine);
-
-    void lsr(uint16_t address);
-    void lsr_a();
-    void lsr_zp(Machine_6502& machine);
-    void lsr_zpx(Machine_6502& machine);
-    void lsr_abs(Machine_6502& machine);
-    void lsr_absx(Machine_6502& machine);
-
+    /* BITWISE INSTRUCTIONS */
     void _and(CPU& cpu, Byte value);
     void and_imm(Machine_6502& machine);
     void and_zp(Machine_6502& machine);
@@ -77,6 +62,44 @@ class Machine_6502 {
     void ora_absy(Machine_6502& machine);
     void ora_inx(Machine_6502& machine);
     void ora_iny(Machine_6502& machine);
+
+    void asl(Machine_6502& machine, uint16_t address);  // unimplemented
+    void asl_a(Machine_6502& machine);
+    void asl_zp(Machine_6502& machine);
+    void asl_zpx(Machine_6502& machine);
+    void asl_abs(Machine_6502& machine);
+    void asl_absx(Machine_6502& machine);
+
+    void lsr(uint16_t address);
+    void lsr_a(Machine_6502& machine);
+    void lsr_zp(Machine_6502& machine);
+    void lsr_zpx(Machine_6502& machine);
+    void lsr_abs(Machine_6502& machine);
+    void lsr_absx(Machine_6502& machine);
+
+    void rol(Machine_6502& machine, uint16_t address);  // unimplemented
+    void rol_a(Machine_6502& machine);
+    void rol_zp(Machine_6502& machine);
+    void rol_zpx(Machine_6502& machine);
+    void rol_abs(Machine_6502& machine);
+    void rol_absx(Machine_6502& machine);
+
+    void ror(Machine_6502& machine, uint16_t address);  // unimplemented
+    void ror_a(Machine_6502& machine);
+    void ror_zp(Machine_6502& machine);
+    void ror_zpx(Machine_6502& machine);
+    void ror_abs(Machine_6502& machine);
+    void ror_absx(Machine_6502& machine);
+
+    /* REGISTER INSTRUCTIONS */
+    void tax(Machine_6502& machine);
+    void txa(Machine_6502& machine);
+    void dex(Machine_6502& machine);
+    void inx(Machine_6502& machine);
+    void tay(Machine_6502& machine);
+    void tya(Machine_6502& machine);
+    void dey(Machine_6502& machine);
+    void iny(Machine_6502& machine);
 
     /* MEMORY INSTRUCTIONS */
     void lda(CPU& cpu, Byte value);
@@ -145,6 +168,7 @@ class Machine_6502 {
     void cmp_inx(Machine_6502& machine);
     void cmp_iny(Machine_6502& machine);
 
+    /* HELPER UTILS */
     uint8_t get_zpg_address();
     uint8_t get_zpgx_address();
     uint8_t get_zpgy_address();
