@@ -32,6 +32,15 @@ class Machine_6502 {
     void reset();
     bool is_eop();
 
+    /* FLAG INSTRUCTIONS */
+    void clc(Machine_6502& machine);
+    void sec(Machine_6502& machine);
+    void cli(Machine_6502& machine);
+    void sei(Machine_6502& machine);
+    void clv(Machine_6502& machine);
+    void cld(Machine_6502& machine);
+    void sed(Machine_6502& machine);
+
     /* BITWISE INSTRUCTIONS */
     void _and(CPU& cpu, Byte value);
     void and_imm(Machine_6502& machine);
@@ -63,7 +72,7 @@ class Machine_6502 {
     void ora_inx(Machine_6502& machine);
     void ora_iny(Machine_6502& machine);
 
-    void asl(Machine_6502& machine, uint16_t address);  // unimplemented
+    void asl(Machine_6502& machine, uint16_t address);
     void asl_a(Machine_6502& machine);
     void asl_zp(Machine_6502& machine);
     void asl_zpx(Machine_6502& machine);
@@ -77,14 +86,14 @@ class Machine_6502 {
     void lsr_abs(Machine_6502& machine);
     void lsr_absx(Machine_6502& machine);
 
-    void rol(Machine_6502& machine, uint16_t address);  // unimplemented
+    void rol(Machine_6502& machine, uint16_t address);
     void rol_a(Machine_6502& machine);
     void rol_zp(Machine_6502& machine);
     void rol_zpx(Machine_6502& machine);
     void rol_abs(Machine_6502& machine);
     void rol_absx(Machine_6502& machine);
 
-    void ror(Machine_6502& machine, uint16_t address);  // unimplemented
+    void ror(Machine_6502& machine, uint16_t address);
     void ror_a(Machine_6502& machine);
     void ror_zp(Machine_6502& machine);
     void ror_zpx(Machine_6502& machine);

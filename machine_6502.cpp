@@ -15,6 +15,21 @@ Machine_6502::Machine_6502()
 
 using namespace std::placeholders;
 void Machine_6502::init_handlers() {
+  std::function<void(Machine_6502& machine)> clc =
+    std::bind(&Machine_6502::clc, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> sec =
+    std::bind(&Machine_6502::sec, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> cli =
+    std::bind(&Machine_6502::cli, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> sei =
+    std::bind(&Machine_6502::sei, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> clv =
+    std::bind(&Machine_6502::clv, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> cld =
+    std::bind(&Machine_6502::cld, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> sed =
+    std::bind(&Machine_6502::sed, this, std::placeholders::_1);
+
   std::function<void(Machine_6502& machine)> tax =
     std::bind(&Machine_6502::tax, this, std::placeholders::_1);
   std::function<void(Machine_6502& machine)> txa =
@@ -232,6 +247,15 @@ void Machine_6502::init_handlers() {
   std::function<void(Machine_6502& machine)> cmp_iny =
     std::bind(&Machine_6502::cmp_iny, this, std::placeholders::_1);
 
+  /* BITWISE INSTRUCTIONS */
+  handlers.insert(std::make_pair(0x18, clc));
+  handlers.insert(std::make_pair(0x38, sec));
+  handlers.insert(std::make_pair(0x58, cli));
+  handlers.insert(std::make_pair(0x78, sei));
+  handlers.insert(std::make_pair(0xB8, clv));
+  handlers.insert(std::make_pair(0xD8, cld));
+  handlers.insert(std::make_pair(0xF8, sed));
+
   handlers.insert(std::make_pair(0xAA, tax));
   handlers.insert(std::make_pair(0x8A, txa));
   handlers.insert(std::make_pair(0xCA, dex));
@@ -350,6 +374,22 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0xC1, cmp_inx));
   handlers.insert(std::make_pair(0xD1, cmp_iny));
 }
+
+/* PROCESSOR STATUS (FLAG) INSTRUCTIONS */
+void Machine_6502::clc(Machine_6502& machine) {
+  machine.get_cpu().CF = false; }
+void Machine_6502::sec(Machine_6502& machine) {
+  machine.get_cpu().CF = true; }
+void Machine_6502::cli(Machine_6502& machine) {
+  machine.get_cpu().IDF = false; }
+void Machine_6502::sei(Machine_6502& machine) {
+  machine.get_cpu().IDF = true; }
+void Machine_6502::clv(Machine_6502& machine) {
+  machine.get_cpu().OFF = false; }
+void Machine_6502::cld(Machine_6502& machine) {
+  machine.get_cpu().DMF = false; }
+void Machine_6502::sed(Machine_6502& machine) {
+  machine.get_cpu().DMF = true; }
 
 void Machine_6502::tax(Machine_6502& machine) {
   machine.get_cpu().X = machine.get_cpu().A; }
