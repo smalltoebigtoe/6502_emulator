@@ -48,18 +48,6 @@ class Machine_6502 {
     void lsr_abs(Machine_6502& machine);
     void lsr_absx(Machine_6502& machine);
 
-    void inc(uint16_t address);
-    void inc_zp(Machine_6502& machine);
-    void inc_zpx(Machine_6502& machine);
-    void inc_abs(Machine_6502& machine);
-    void inc_absx(Machine_6502& machine);
-
-    void dec(uint16_t address);
-    void dec_zp(Machine_6502& machine);
-    void dec_zpx(Machine_6502& machine);
-    void dec_abs(Machine_6502& machine);
-    void dec_absx(Machine_6502& machine);
-
     void _and(CPU& cpu, Byte value);
     void and_imm(Machine_6502& machine);
     void and_zp(Machine_6502& machine);
@@ -90,6 +78,7 @@ class Machine_6502 {
     void ora_inx(Machine_6502& machine);
     void ora_iny(Machine_6502& machine);
 
+    /* MEMORY INSTRUCTIONS */
     void lda(CPU& cpu, Byte value);
     void lda_imm(Machine_6502& machine);
     void lda_zp(Machine_6502& machine);
@@ -114,6 +103,38 @@ class Machine_6502 {
     void ldy_abs(Machine_6502& machine);
     void ldy_absx(Machine_6502& machine);
 
+    void inc(uint16_t address);
+    void inc_zp(Machine_6502& machine);
+    void inc_zpx(Machine_6502& machine);
+    void inc_abs(Machine_6502& machine);
+    void inc_absx(Machine_6502& machine);
+
+    void dec(uint16_t address);
+    void dec_zp(Machine_6502& machine);
+    void dec_zpx(Machine_6502& machine);
+    void dec_abs(Machine_6502& machine);
+    void dec_absx(Machine_6502& machine);
+
+    void sta(CPU& cpu, Byte value);
+    void sta_zp(Machine_6502& machine);
+    void sta_zpx(Machine_6502& machine);
+    void sta_abs(Machine_6502& machine);
+    void sta_absx(Machine_6502& machine);
+    void sta_absy(Machine_6502& machine);
+    void sta_inx(Machine_6502& machine);
+    void sta_iny(Machine_6502& machine);
+
+    void stx(CPU& cpu, Byte value);
+    void stx_zp(Machine_6502& machine);
+    void stx_zpy(Machine_6502& machine);
+    void stx_abs(Machine_6502& machine);
+
+    void sty(CPU& cpu, Byte value);
+    void sty_zp(Machine_6502& machine);
+    void sty_zpx(Machine_6502& machine);
+    void sty_abs(Machine_6502& machine);
+
+    /* COMPARE INSTRUCTIONS */
     void cmp(CPU& cpu, Byte reg, Byte value);
     void cmp_imm(Machine_6502& machine);
     void cmp_zp(Machine_6502& machine);
