@@ -11,6 +11,18 @@ cmake -DBUILD_TESTING=ON && make &&
 ./6502_emulator
 ```
 
+## Current Instruction Status
+- [ ] Bitwise Instructions
+- [ ] Branch Instructions
+- [ ] Compare Instructions
+- [ ] Flag Instructions
+- [ ] Jump Instructions
+- [ ] Math Instructions
+- [x] Memory Instructions
+- [x] Register Instructions
+- [ ] Stack Instructions
+- [ ] Misc. Instructions
+
 [Reference1](https://c64os.com/post/6502instructions)
 
 [Reference2](http://6502.org/tutorials/6502opcodes.html)
