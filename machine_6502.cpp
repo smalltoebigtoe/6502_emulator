@@ -15,6 +15,42 @@ Machine_6502::Machine_6502()
 
 using namespace std::placeholders;
 void Machine_6502::init_handlers() {
+  /* MATH INSTRUCTIONS */
+  std::function<void(Machine_6502& machine)> adc_imm =
+    std::bind(&Machine_6502::adc_imm, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> adc_zp =
+    std::bind(&Machine_6502::adc_zp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> adc_zpx =
+    std::bind(&Machine_6502::adc_zpx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> adc_abs =
+    std::bind(&Machine_6502::adc_abs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> adc_absx =
+    std::bind(&Machine_6502::adc_absx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> adc_absy =
+    std::bind(&Machine_6502::adc_absy, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> adc_inx =
+    std::bind(&Machine_6502::adc_inx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> adc_iny =
+    std::bind(&Machine_6502::adc_iny, this, std::placeholders::_1);
+
+  std::function<void(Machine_6502& machine)> sbc_imm =
+    std::bind(&Machine_6502::sbc_imm, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> sbc_zp =
+    std::bind(&Machine_6502::sbc_zp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> sbc_zpx =
+    std::bind(&Machine_6502::sbc_zpx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> sbc_abs =
+    std::bind(&Machine_6502::sbc_abs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> sbc_absx =
+    std::bind(&Machine_6502::sbc_absx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> sbc_absy =
+    std::bind(&Machine_6502::sbc_absy, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> sbc_inx =
+    std::bind(&Machine_6502::sbc_inx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> sbc_iny =
+    std::bind(&Machine_6502::sbc_iny, this, std::placeholders::_1);
+
+  /* FLAG INSTRUCTIONS */
   std::function<void(Machine_6502& machine)> clc =
     std::bind(&Machine_6502::clc, this, std::placeholders::_1);
   std::function<void(Machine_6502& machine)> sec =
@@ -247,6 +283,25 @@ void Machine_6502::init_handlers() {
   std::function<void(Machine_6502& machine)> cmp_iny =
     std::bind(&Machine_6502::cmp_iny, this, std::placeholders::_1);
 
+  /* MATH INSTRUCTIONS */
+  handlers.insert(std::make_pair(0x69, adc_imm));
+  handlers.insert(std::make_pair(0x65, adc_zp));
+  handlers.insert(std::make_pair(0x75, adc_zpx));
+  handlers.insert(std::make_pair(0x6D, adc_abs));
+  handlers.insert(std::make_pair(0x7D, adc_absx));
+  handlers.insert(std::make_pair(0x79, adc_absy));
+  handlers.insert(std::make_pair(0x61, adc_inx));
+  handlers.insert(std::make_pair(0x71, adc_iny));
+
+  handlers.insert(std::make_pair(0xE9, sbc_imm));
+  handlers.insert(std::make_pair(0xE5, sbc_zp));
+  handlers.insert(std::make_pair(0xF5, sbc_zpx));
+  handlers.insert(std::make_pair(0xED, sbc_abs));
+  handlers.insert(std::make_pair(0xFD, sbc_absx));
+  handlers.insert(std::make_pair(0xF9, sbc_absy));
+  handlers.insert(std::make_pair(0xE1, sbc_inx));
+  handlers.insert(std::make_pair(0xF1, sbc_iny));
+
   /* BITWISE INSTRUCTIONS */
   handlers.insert(std::make_pair(0x18, clc));
   handlers.insert(std::make_pair(0x38, sec));
@@ -374,6 +429,63 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0xC1, cmp_inx));
   handlers.insert(std::make_pair(0xD1, cmp_iny));
 }
+
+/* MATH INSTRUCTIONS */
+void Machine_6502::adc(Machine_6502& machine, uint16_t address) {
+  auto init_a = machine.get_cpu().A;
+  Byte value = machine.get_module().get_at(address);
+  uint16_t result = init_a + value;
+  if (machine.get_cpu().CF)
+    result += 1;
+
+  machine.get_cpu().A = result;
+  auto a = machine.get_cpu().A;
+
+  machine.get_cpu().ZF = (a == 0);
+  machine.get_cpu().NF = ((a & 0x80) == 0x80);
+  machine.get_cpu().CF = (result > 0xFF);
+  machine.get_cpu().OFF = (
+    (value < 0x7F && init_a < 0x7F && a > 0x7F) ||
+    (value > 0x7F && init_a > 0x7F && a < 0x7F));
+}
+void Machine_6502::adc_imm(Machine_6502& machine) {
+  adc(machine, read_program_byte()); }
+void Machine_6502::adc_zp(Machine_6502& machine) {
+  adc(machine, get_zpg_address()); }
+void Machine_6502::adc_zpx(Machine_6502& machine) {
+  adc(machine, get_zpgx_address()); }
+void Machine_6502::adc_abs(Machine_6502& machine) {
+  adc(machine, get_abs_address()); }
+void Machine_6502::adc_absx(Machine_6502& machine) {
+  adc(machine, get_absx_address()); }
+void Machine_6502::adc_absy(Machine_6502& machine) {
+  adc(machine, get_absy_address()); }
+void Machine_6502::adc_inx(Machine_6502& machine) {
+  adc(machine, get_indx_address()); }
+void Machine_6502::adc_iny(Machine_6502& machine) {
+  adc(machine, get_indy_address()); }
+
+void Machine_6502::sbc(Machine_6502& machine, uint16_t address) {
+  auto value = machine.get_module().get_at(address);
+  uint8_t add = machine.get_cpu().CF ? 0 : 1;
+  adc(machine, (0xFF ^ value) + add);
+}
+void Machine_6502::sbc_imm(Machine_6502& machine) {
+  sbc(machine, machine.read_program_byte()); }
+void Machine_6502::sbc_zp(Machine_6502& machine) {
+  sbc(machine, machine.get_zpg_address()); }
+void Machine_6502::sbc_zpx(Machine_6502& machine) {
+  sbc(machine, machine.get_zpgx_address()); }
+void Machine_6502::sbc_abs(Machine_6502& machine) {
+  sbc(machine, machine.get_abs_address()); }
+void Machine_6502::sbc_absx(Machine_6502& machine) {
+  sbc(machine, machine.get_absx_address()); }
+void Machine_6502::sbc_absy(Machine_6502& machine) {
+  sbc(machine, machine.get_absy_address()); }
+void Machine_6502::sbc_inx(Machine_6502& machine) {
+  sbc(machine, machine.get_indx_address()); }
+void Machine_6502::sbc_iny(Machine_6502& machine) {
+  sbc(machine, machine.get_indy_address()); }
 
 /* PROCESSOR STATUS (FLAG) INSTRUCTIONS */
 void Machine_6502::clc(Machine_6502& machine) {

@@ -32,6 +32,27 @@ class Machine_6502 {
     void reset();
     bool is_eop();
 
+    /* MATH INSTRUCTIONS */
+    void adc(Machine_6502& machine, uint16_t address);
+    void adc_imm(Machine_6502& machine);
+    void adc_zp(Machine_6502& machine);
+    void adc_zpx(Machine_6502& machine);
+    void adc_abs(Machine_6502& machine);
+    void adc_absx(Machine_6502& machine);
+    void adc_absy(Machine_6502& machine);
+    void adc_inx(Machine_6502& machine);
+    void adc_iny(Machine_6502& machine);
+
+    void sbc(Machine_6502& machine, uint16_t address);
+    void sbc_imm(Machine_6502& machine);
+    void sbc_zp(Machine_6502& machine);
+    void sbc_zpx(Machine_6502& machine);
+    void sbc_abs(Machine_6502& machine);
+    void sbc_absx(Machine_6502& machine);
+    void sbc_absy(Machine_6502& machine);
+    void sbc_inx(Machine_6502& machine);
+    void sbc_iny(Machine_6502& machine);
+
     /* FLAG INSTRUCTIONS */
     void clc(Machine_6502& machine);
     void sec(Machine_6502& machine);
