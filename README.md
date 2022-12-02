@@ -12,12 +12,12 @@ cmake -DBUILD_TESTING=ON && make &&
 ```
 
 ## Current Instruction Status
-- [ ] Bitwise Instructions
+- [x] Bitwise Instructions
 - [ ] Branch Instructions
 - [ ] Compare Instructions
-- [ ] Flag Instructions
+- [x] Flag Instructions
 - [ ] Jump Instructions
-- [ ] Math Instructions
+- [x] Math Instructions
 - [x] Memory Instructions
 - [x] Register Instructions
 - [ ] Stack Instructions
