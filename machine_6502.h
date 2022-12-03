@@ -32,6 +32,30 @@ class Machine_6502 {
     void reset();
     bool is_eop();
 
+    /* COMPARE INSTRUCTIONS */
+    void bit(Machine_6502& machine, uint16_t address);
+    void bit_zp(Machine_6502& machine);
+    void bit_abs(Machine_6502& machine);
+    void cmp(Machine_6502& machine, Byte value);
+    void cmp_imm(Machine_6502& machine);
+    void cmp_zp(Machine_6502& machine);
+    void cmp_zpx(Machine_6502& machine);
+    void cmp_abs(Machine_6502& machine);
+    void cmp_absx(Machine_6502& machine);
+    void cmp_absy(Machine_6502& machine);
+    void cmp_inx(Machine_6502& machine);
+    void cmp_iny(Machine_6502& machine);
+
+    void cmpx(Machine_6502& machine, Byte value);
+    void cmpx_imm(Machine_6502& machine);
+    void cmpx_zp(Machine_6502& machine);
+    void cmpx_abs(Machine_6502& machine);
+
+    void cmpy(Machine_6502& machine, Byte value);
+    void cmpy_imm(Machine_6502& machine);
+    void cmpy_zp(Machine_6502& machine);
+    void cmpy_abs(Machine_6502& machine);
+
     /* MATH INSTRUCTIONS */
     void adc(Machine_6502& machine, uint16_t address);
     void adc_imm(Machine_6502& machine);
@@ -187,7 +211,8 @@ class Machine_6502 {
     void sty_zpx(Machine_6502& machine);
     void sty_abs(Machine_6502& machine);
 
-    /* COMPARE INSTRUCTIONS */
+    /*
+     COMPARE INSTRUCTIONS 
     void cmp(CPU& cpu, Byte reg, Byte value);
     void cmp_imm(Machine_6502& machine);
     void cmp_zp(Machine_6502& machine);
@@ -197,6 +222,7 @@ class Machine_6502 {
     void cmp_absy(Machine_6502& machine);
     void cmp_inx(Machine_6502& machine);
     void cmp_iny(Machine_6502& machine);
+    */
 
     /* HELPER UTILS */
     uint8_t get_zpg_address();

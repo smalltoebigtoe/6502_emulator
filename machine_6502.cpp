@@ -15,6 +15,43 @@ Machine_6502::Machine_6502()
 
 using namespace std::placeholders;
 void Machine_6502::init_handlers() {
+  /* COMPARE INSTRUCTIONS */
+  std::function<void(Machine_6502& machine)> bit_zp =
+    std::bind(&Machine_6502::bit_zp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> bit_abs =
+    std::bind(&Machine_6502::bit_abs, this, std::placeholders::_1);
+
+  std::function<void(Machine_6502& machine)> cmp_imm =
+    std::bind(&Machine_6502::cmp_imm, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> cmp_zp =
+    std::bind(&Machine_6502::cmp_zp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> cmp_zpx =
+    std::bind(&Machine_6502::cmp_zpx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> cmp_abs =
+    std::bind(&Machine_6502::cmp_abs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> cmp_absx =
+    std::bind(&Machine_6502::cmp_absx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> cmp_absy =
+    std::bind(&Machine_6502::cmp_absy, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> cmp_inx =
+    std::bind(&Machine_6502::cmp_inx, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> cmp_iny =
+    std::bind(&Machine_6502::cmp_iny, this, std::placeholders::_1);
+
+  std::function<void(Machine_6502& machine)> cmpx_imm =
+    std::bind(&Machine_6502::cmpx_imm, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> cmpx_zp =
+    std::bind(&Machine_6502::cmpx_zp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> cmpx_abs =
+    std::bind(&Machine_6502::cmpx_abs, this, std::placeholders::_1);
+
+  std::function<void(Machine_6502& machine)> cmpy_imm =
+    std::bind(&Machine_6502::cmpy_imm, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> cmpy_zp =
+    std::bind(&Machine_6502::cmpy_zp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> cmpy_abs =
+    std::bind(&Machine_6502::cmpy_abs, this, std::placeholders::_1);
+
   /* MATH INSTRUCTIONS */
   std::function<void(Machine_6502& machine)> adc_imm =
     std::bind(&Machine_6502::adc_imm, this, std::placeholders::_1);
@@ -266,22 +303,25 @@ void Machine_6502::init_handlers() {
     std::bind(&Machine_6502::sty_abs, this, std::placeholders::_1);
 
   /* COMPARE INSTRUCTIONS */
-  std::function<void(Machine_6502& machine)> cmp_imm =
-    std::bind(&Machine_6502::cmp_imm, this, std::placeholders::_1);
-  std::function<void(Machine_6502& machine)> cmp_zp =
-    std::bind(&Machine_6502::cmp_zp, this, std::placeholders::_1);
-  std::function<void(Machine_6502& machine)> cmp_zpx =
-    std::bind(&Machine_6502::cmp_zpx, this, std::placeholders::_1);
-  std::function<void(Machine_6502& machine)> cmp_abs =
-    std::bind(&Machine_6502::cmp_abs, this, std::placeholders::_1);
-  std::function<void(Machine_6502& machine)> cmp_absx =
-    std::bind(&Machine_6502::cmp_absx, this, std::placeholders::_1);
-  std::function<void(Machine_6502& machine)> cmp_absy =
-    std::bind(&Machine_6502::cmp_absy, this, std::placeholders::_1);
-  std::function<void(Machine_6502& machine)> cmp_inx =
-    std::bind(&Machine_6502::cmp_inx, this, std::placeholders::_1);
-  std::function<void(Machine_6502& machine)> cmp_iny =
-    std::bind(&Machine_6502::cmp_iny, this, std::placeholders::_1);
+  handlers.insert(std::make_pair(0x24, bit_zp));
+  handlers.insert(std::make_pair(0x2C, bit_abs));
+
+  handlers.insert(std::make_pair(0xC9, cmp_imm));
+  handlers.insert(std::make_pair(0xC5, cmp_zp));
+  handlers.insert(std::make_pair(0xD5, cmp_zpx));
+  handlers.insert(std::make_pair(0xCD, cmp_abs));
+  handlers.insert(std::make_pair(0xDD, cmp_absx));
+  handlers.insert(std::make_pair(0xD9, cmp_absy));
+  handlers.insert(std::make_pair(0xC1, cmp_inx));
+  handlers.insert(std::make_pair(0xD1, cmp_iny));
+
+  handlers.insert(std::make_pair(0xE0, cmpx_imm));
+  handlers.insert(std::make_pair(0xE4, cmpx_zp));
+  handlers.insert(std::make_pair(0xEC, cmpx_abs));
+
+  handlers.insert(std::make_pair(0xC0, cmpy_imm));
+  handlers.insert(std::make_pair(0xC4, cmpy_zp));
+  handlers.insert(std::make_pair(0xCC, cmpy_abs));
 
   /* MATH INSTRUCTIONS */
   handlers.insert(std::make_pair(0x69, adc_imm));
@@ -429,6 +469,86 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0xC1, cmp_inx));
   handlers.insert(std::make_pair(0xD1, cmp_iny));
 }
+
+/* COMPARE INSTRUCTIONS */
+void Machine_6502::bit(Machine_6502& machine, uint16_t address) {
+  auto cpu_a = machine.get_cpu().A;
+  auto mem = machine.get_module().get_at(address);
+  machine.get_cpu().ZF = ((cpu_a & mem) == 0);
+  machine.get_cpu().NF = ((mem & 0x80) == 0x80);
+  machine.get_cpu().OFF = ((mem & 0x40) == 0x40);
+}
+void Machine_6502::bit_zp(Machine_6502& machine) {
+  bit(machine, get_zpg_address()); }
+void Machine_6502::bit_abs(Machine_6502& machine) {
+  bit(machine, get_abs_address()); }
+
+void Machine_6502::cmp(Machine_6502& machine, Byte value) {
+  Byte reg_val = machine.get_cpu().A;
+  uint8_t result = reg_val - value;
+  machine.get_cpu().CF = false;
+  machine.get_cpu().ZF = false;
+  if (reg_val >= value)
+    machine.get_cpu().CF = true;
+  if (reg_val == value)
+    machine.get_cpu().ZF = true;
+  if ((result & 0x80) == 0x80)
+    machine.get_cpu().NF = true;
+}
+void Machine_6502::cmp_imm(Machine_6502& machine) {
+  cmp(machine, machine.read_program_byte()); }
+void Machine_6502::cmp_zp(Machine_6502& machine) {
+  cmp(machine, machine.get_module().get_at(machine.get_zpg_address())); }
+void Machine_6502::cmp_zpx(Machine_6502& machine) {
+  cmp(machine, machine.get_module().get_at(machine.get_zpgx_address())); }
+void Machine_6502::cmp_abs(Machine_6502& machine) {
+  cmp(machine, machine.get_module().get_at(machine.get_abs_address())); }
+void Machine_6502::cmp_absx(Machine_6502& machine) {
+  cmp(machine, machine.get_module().get_at(machine.get_absx_address())); }
+void Machine_6502::cmp_absy(Machine_6502& machine) {
+  cmp(machine, machine.get_module().get_at(machine.get_absy_address())); }
+void Machine_6502::cmp_inx(Machine_6502& machine) {
+  cmp(machine, machine.get_module().get_at(machine.get_indx_address())); }
+void Machine_6502::cmp_iny(Machine_6502& machine) {
+  cmp(machine, machine.get_module().get_at(machine.get_indy_address())); }
+
+void Machine_6502::cmpx(Machine_6502& machine, Byte value) {
+  Byte reg_val = machine.get_cpu().X;
+  uint8_t result = reg_val - value;
+  machine.get_cpu().CF = false;
+  machine.get_cpu().ZF = false;
+  if (reg_val >= value)
+    machine.get_cpu().CF = true;
+  if (reg_val == value)
+    machine.get_cpu().ZF = true;
+  if ((result & 0x80) == 0x80)
+    machine.get_cpu().NF = true;
+}
+void Machine_6502::cmpx_imm(Machine_6502& machine) {
+  cmp(machine, machine.read_program_byte()); }
+void Machine_6502::cmpx_zp(Machine_6502& machine) {
+  cmp(machine, machine.get_module().get_at(machine.get_zpg_address())); }
+void Machine_6502::cmpx_abs(Machine_6502& machine) {
+  cmp(machine, machine.get_module().get_at(machine.get_abs_address())); }
+
+void Machine_6502::cmpy(Machine_6502& machine, Byte value) {
+  Byte reg_val = machine.get_cpu().Y;
+  uint8_t result = reg_val - value;
+  machine.get_cpu().CF = false;
+  machine.get_cpu().ZF = false;
+  if (reg_val >= value)
+    machine.get_cpu().CF = true;
+  if (reg_val == value)
+    machine.get_cpu().ZF = true;
+  if ((result & 0x80) == 0x80)
+    machine.get_cpu().NF = true;
+}
+void Machine_6502::cmpy_imm(Machine_6502& machine) {
+  cmp(machine, machine.read_program_byte()); }
+void Machine_6502::cmpy_zp(Machine_6502& machine) {
+  cmp(machine, machine.get_module().get_at(machine.get_zpg_address())); }
+void Machine_6502::cmpy_abs(Machine_6502& machine) {
+  cmp(machine, machine.get_module().get_at(machine.get_abs_address())); }
 
 /* MATH INSTRUCTIONS */
 void Machine_6502::adc(Machine_6502& machine, uint16_t address) {
@@ -818,7 +938,7 @@ void Machine_6502::sty_zpx(Machine_6502& machine) {
 void Machine_6502::sty_abs(Machine_6502& machine) {
   sta(machine.get_cpu(), machine.get_abs_address()); }
 
-/* COMPARE INSTRUCTIONS */
+/*
 void Machine_6502::cmp(CPU& cpu, Byte reg_val, Byte value) {
   Byte result = reg_val - value;
   cpu.CF = false;
@@ -846,6 +966,7 @@ void Machine_6502::cmp_inx(Machine_6502& machine) {
   cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_indx_address())); }
 void Machine_6502::cmp_iny(Machine_6502& machine) {
   cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_indy_address())); }
+*/
 
 CPU& Machine_6502::get_cpu() {
   return *m_cpu; }
