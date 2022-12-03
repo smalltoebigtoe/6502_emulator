@@ -6,15 +6,31 @@ Machine_6502::Machine_6502()
   : m_instruction_address{ 0 }, m_instruction_size{ 0 } {
   CPU cpu;
   Memory memory;
+  Stack stack;
   cpu.reset();
   memory.reset();
+  stack.init_stack();
   m_cpu = &cpu;
   m_module = &memory;
+  m_stack = &stack;
   init_handlers();
 }
 
 using namespace std::placeholders;
 void Machine_6502::init_handlers() {
+  /* JUMP INSTRUCTIONS */
+  std::function<void(Machine_6502& machine)> jmp_abs =
+    std::bind(&Machine_6502::jmp_abs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> jmp_in =
+    std::bind(&Machine_6502::jmp_in, this, std::placeholders::_1);
+
+  std::function<void(Machine_6502& machine)> jsr_abs =
+    std::bind(&Machine_6502::jsr_abs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> rts_imp =
+    std::bind(&Machine_6502::rts_imp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> rti_imp =
+    std::bind(&Machine_6502::rti_imp, this, std::placeholders::_1);
+
   /* COMPARE INSTRUCTIONS */
   std::function<void(Machine_6502& machine)> bit_zp =
     std::bind(&Machine_6502::bit_zp, this, std::placeholders::_1);
@@ -302,6 +318,14 @@ void Machine_6502::init_handlers() {
   std::function<void(Machine_6502& machine)> sty_abs =
     std::bind(&Machine_6502::sty_abs, this, std::placeholders::_1);
 
+  /* JUMP INSTRUCTIONS */
+  handlers.insert(std::make_pair(0x4C, jmp_abs));
+  handlers.insert(std::make_pair(0x6C, jmp_in));
+
+  handlers.insert(std::make_pair(0x20, jsr_abs));
+  handlers.insert(std::make_pair(0x60, rts_imp));
+  handlers.insert(std::make_pair(0x40, rti_imp));
+
   /* COMPARE INSTRUCTIONS */
   handlers.insert(std::make_pair(0x24, bit_zp));
   handlers.insert(std::make_pair(0x2C, bit_abs));
@@ -459,7 +483,7 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0x94, sty_zpx));
   handlers.insert(std::make_pair(0x8C, sty_abs));
 
-  /* COMPARE INSTRUCTIONS */
+  /*
   handlers.insert(std::make_pair(0xC9, cmp_imm));
   handlers.insert(std::make_pair(0xC5, cmp_zp));
   handlers.insert(std::make_pair(0xD5, cmp_zpx));
@@ -467,7 +491,34 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0xDD, cmp_absx));
   handlers.insert(std::make_pair(0xD9, cmp_absy));
   handlers.insert(std::make_pair(0xC1, cmp_inx));
-  handlers.insert(std::make_pair(0xD1, cmp_iny));
+  handlers.insert(std::make_pair(0xD1, cmp_iny)); */
+}
+
+/* JUMP INSTRUCTIONS */
+void Machine_6502::jmp_abs(Machine_6502& machine) {
+  uint16_t address = machine.get_abs_address();
+  machine.get_cpu().PC = address;
+}
+void Machine_6502::jmp_in(Machine_6502& machine) {
+  uint16_t address = machine.get_ind_address();
+  machine.get_cpu().PC = address;
+}
+
+void Machine_6502::jsr_abs(Machine_6502& machine) {
+  uint16_t address = machine.get_abs_address();
+  uint16_t pc = machine.get_cpu().PC;
+  machine.get_stack().push(pc >> 8);
+  machine.get_stack().push(pc);
+  machine.get_cpu().PC = address;
+}
+void Machine_6502::rts_imp(Machine_6502& machine) {
+  auto low_byte = machine.get_stack().pop();
+  auto high_byte = machine.get_stack().pop();
+  uint16_t ret_adr = (high_byte << 8) + low_byte;
+  machine.get_cpu().PC = ret_adr;
+}
+void Machine_6502::rti_imp(Machine_6502& machine) {
+  ;
 }
 
 /* COMPARE INSTRUCTIONS */
@@ -938,41 +989,14 @@ void Machine_6502::sty_zpx(Machine_6502& machine) {
 void Machine_6502::sty_abs(Machine_6502& machine) {
   sta(machine.get_cpu(), machine.get_abs_address()); }
 
-/*
-void Machine_6502::cmp(CPU& cpu, Byte reg_val, Byte value) {
-  Byte result = reg_val - value;
-  cpu.CF = false;
-  cpu.ZF = false;
-  if (reg_val >= value)
-    cpu.CF = true;
-  if (reg_val == value)
-    cpu.ZF = true;
-  if ((result & 0x80) == 0x80)
-    cpu.NF = true;
-}
-void Machine_6502::cmp_imm(Machine_6502& machine) {
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.read_program_byte()); }
-void Machine_6502::cmp_zp(Machine_6502& machine) {
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_zpg_address())); }
-void Machine_6502::cmp_zpx(Machine_6502& machine) {
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_zpgx_address())); }
-void Machine_6502::cmp_abs(Machine_6502& machine) {
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_abs_address())); }
-void Machine_6502::cmp_absx(Machine_6502& machine) {
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_absx_address())); }
-void Machine_6502::cmp_absy(Machine_6502& machine) {
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_absy_address())); }
-void Machine_6502::cmp_inx(Machine_6502& machine) {
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_indx_address())); }
-void Machine_6502::cmp_iny(Machine_6502& machine) {
-  cmp(machine.get_cpu(), machine.get_cpu().A, machine.get_module().get_at(get_indy_address())); }
-*/
-
 CPU& Machine_6502::get_cpu() {
   return *m_cpu; }
 
 Memory& Machine_6502::get_module() {
   return *m_module; }
+
+Stack& Machine_6502::get_stack() {
+  return *m_stack; }
 
 void Machine_6502::load(const std::vector<Byte> instructions, Word address) {
   m_instruction_address = address;

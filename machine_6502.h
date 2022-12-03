@@ -9,11 +9,13 @@
 #include "cpu.h"
 #include "memory.h"
 #include "data.h"
+#include "stack.h"
 
 class Machine_6502 {
   private:
     CPU* m_cpu;
     Memory* m_module;
+    Stack* m_stack;
 
     Word m_instruction_address;
     Word m_instruction_size;
@@ -26,11 +28,20 @@ class Machine_6502 {
     void init_handlers();
     CPU& get_cpu();
     Memory& get_module();
+    Stack& get_stack();
     Byte read_program_byte();
     void load(const std::vector<Byte> instructions, Word address);
     void execute(Machine_6502& machine);
     void reset();
     bool is_eop();
+
+    /* JUMP INSTRUCTIONS */
+    void jmp_abs(Machine_6502& machine);
+    void jmp_in(Machine_6502& machine);
+
+    void jsr_abs(Machine_6502& machine);
+    void rts_imp(Machine_6502& machine);
+    void rti_imp(Machine_6502& machine);
 
     /* COMPARE INSTRUCTIONS */
     void bit(Machine_6502& machine, uint16_t address);
@@ -210,19 +221,6 @@ class Machine_6502 {
     void sty_zp(Machine_6502& machine);
     void sty_zpx(Machine_6502& machine);
     void sty_abs(Machine_6502& machine);
-
-    /*
-     COMPARE INSTRUCTIONS 
-    void cmp(CPU& cpu, Byte reg, Byte value);
-    void cmp_imm(Machine_6502& machine);
-    void cmp_zp(Machine_6502& machine);
-    void cmp_zpx(Machine_6502& machine);
-    void cmp_abs(Machine_6502& machine);
-    void cmp_absx(Machine_6502& machine);
-    void cmp_absy(Machine_6502& machine);
-    void cmp_inx(Machine_6502& machine);
-    void cmp_iny(Machine_6502& machine);
-    */
 
     /* HELPER UTILS */
     uint8_t get_zpg_address();
