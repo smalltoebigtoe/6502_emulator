@@ -18,6 +18,22 @@ Machine_6502::Machine_6502()
 
 using namespace std::placeholders;
 void Machine_6502::init_handlers() {
+  /* STACK INSTRUCTIONS */
+  std::function<void(Machine_6502& machine)> pha =
+    std::bind(&Machine_6502::pha, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> php =
+    std::bind(&Machine_6502::php, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> txs =
+    std::bind(&Machine_6502::txs, this, std::placeholders::_1);
+
+  std::function<void(Machine_6502& machine)> pla =
+    std::bind(&Machine_6502::pla, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> tsx =
+    std::bind(&Machine_6502::tsx, this, std::placeholders::_1);
+
+  std::function<void(Machine_6502& machine)> plp =
+    std::bind(&Machine_6502::plp, this, std::placeholders::_1);
+
   /* JUMP INSTRUCTIONS */
   std::function<void(Machine_6502& machine)> jmp_abs =
     std::bind(&Machine_6502::jmp_abs, this, std::placeholders::_1);
@@ -318,6 +334,16 @@ void Machine_6502::init_handlers() {
   std::function<void(Machine_6502& machine)> sty_abs =
     std::bind(&Machine_6502::sty_abs, this, std::placeholders::_1);
 
+  /* STACK INSTRUCTIONS */
+  handlers.insert(std::make_pair(0x48, pha));
+  handlers.insert(std::make_pair(0x08, php));
+  handlers.insert(std::make_pair(0x9A, txs));
+
+  handlers.insert(std::make_pair(0x68, pla));
+  handlers.insert(std::make_pair(0xBA, tsx));
+
+  handlers.insert(std::make_pair(0x28, plp));
+
   /* JUMP INSTRUCTIONS */
   handlers.insert(std::make_pair(0x4C, jmp_abs));
   handlers.insert(std::make_pair(0x6C, jmp_in));
@@ -482,17 +508,32 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0x84, sty_zp));
   handlers.insert(std::make_pair(0x94, sty_zpx));
   handlers.insert(std::make_pair(0x8C, sty_abs));
-
-  /*
-  handlers.insert(std::make_pair(0xC9, cmp_imm));
-  handlers.insert(std::make_pair(0xC5, cmp_zp));
-  handlers.insert(std::make_pair(0xD5, cmp_zpx));
-  handlers.insert(std::make_pair(0xCD, cmp_abs));
-  handlers.insert(std::make_pair(0xDD, cmp_absx));
-  handlers.insert(std::make_pair(0xD9, cmp_absy));
-  handlers.insert(std::make_pair(0xC1, cmp_inx));
-  handlers.insert(std::make_pair(0xD1, cmp_iny)); */
 }
+
+/* STACK INSTRUCTIONS */
+void Machine_6502::pha(Machine_6502& machine) {
+  machine.get_stack().push(machine.get_cpu().A); }
+void Machine_6502::php(Machine_6502& machine) {
+  machine.get_stack().push(machine.get_cpu().processor_status); }
+void Machine_6502::txs(Machine_6502& machine) {
+  auto value = machine.get_cpu().X;
+  machine.get_cpu().processor_status = value;
+  // does not change ZF, NF flags
+}
+void Machine_6502::pla(Machine_6502& machine) {
+  auto value = machine.get_stack().pop();
+  machine.get_cpu().A = value;
+  machine.get_cpu().ZF = (value == 0);
+  machine.get_cpu().NF = ((value & 0x80) == 0x80);
+}
+void Machine_6502::tsx(Machine_6502& machine) {
+  auto value = machine.get_cpu().SP;
+  machine.get_cpu().X = value;
+  machine.get_cpu().ZF = (value == 0);
+  machine.get_cpu().NF = ((value & 0x80) == 0x80);
+}
+void Machine_6502::plp(Machine_6502& machine) {
+  machine.get_cpu().processor_status = machine.get_stack().pop(); }
 
 /* JUMP INSTRUCTIONS */
 void Machine_6502::jmp_abs(Machine_6502& machine) {

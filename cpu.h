@@ -12,6 +12,7 @@ struct CPU
   Byte A;  // register A (accumulator)
   Byte X;  // register X
   Byte Y;  // register Y
+  Byte processor_status;
 
   bool CF;   // carry flag
   bool ZF;   // zero flag

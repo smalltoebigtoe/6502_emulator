@@ -35,6 +35,16 @@ class Machine_6502 {
     void reset();
     bool is_eop();
 
+    /* STACK INSTRUCTIONS */
+    void pha(Machine_6502& machine);
+    void php(Machine_6502& machine);
+    void txs(Machine_6502& machine);
+
+    void pla(Machine_6502& machine);
+    void tsx(Machine_6502& machine);
+
+    void plp(Machine_6502& machine);
+
     /* JUMP INSTRUCTIONS */
     void jmp_abs(Machine_6502& machine);
     void jmp_in(Machine_6502& machine);

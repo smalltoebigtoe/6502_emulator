@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 add_compile_options(-g -O0 -Wall -Werror -std=c++1z)
 
-set(CPP_FILES "main.cpp;cpu.cpp;memory.cpp;machine_6502.cpp;debug.cpp")
+set(CPP_FILES "main.cpp;cpu.cpp;memory.cpp;machine_6502.cpp;debug.cpp;stack.cpp")
 add_executable(6502_emulator ${CPP_FILES})
 set_target_properties(6502_emulator PROPERTIES CXX_EXTENSIONS OFF OUTPUT_NAME 6502_emulator)
 target_compile_features(6502_emulator PUBLIC cxx_std_17)
@@ -19,6 +19,7 @@ if(BUILD_TESTING)
       machine_6502.cpp
       cpu.cpp
       memory.cpp
+      stack.cpp
       debug.cpp
     )
 
