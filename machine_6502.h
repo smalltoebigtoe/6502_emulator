@@ -230,7 +230,7 @@ class Machine_6502 {
     void dec_abs(Machine_6502& machine);
     void dec_absx(Machine_6502& machine);
 
-    void sta(CPU& cpu, Byte value);
+    void sta(Machine_6502& machine, Word address, Byte reg_val);
     void sta_zp(Machine_6502& machine);
     void sta_zpx(Machine_6502& machine);
     void sta_abs(Machine_6502& machine);
@@ -239,12 +239,12 @@ class Machine_6502 {
     void sta_inx(Machine_6502& machine);
     void sta_iny(Machine_6502& machine);
 
-    void stx(CPU& cpu, Byte value);
+    //void stx(Machine_6502& machine, Word address, Byte reg_val);
     void stx_zp(Machine_6502& machine);
     void stx_zpy(Machine_6502& machine);
     void stx_abs(Machine_6502& machine);
 
-    void sty(CPU& cpu, Byte value);
+    //void sty(Machine_6502& machine, Word address, Byte reg_val);
     void sty_zp(Machine_6502& machine);
     void sty_zpx(Machine_6502& machine);
     void sty_abs(Machine_6502& machine);

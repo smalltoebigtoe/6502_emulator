@@ -1088,40 +1088,38 @@ void Machine_6502::dec_abs(Machine_6502& machine) {
 void Machine_6502::dec_absx(Machine_6502& machine) {
   dec(machine.get_absx_address()); }
 
-void Machine_6502::sta(CPU& cpu, Byte value) {
-  cpu.A = value; }
+void Machine_6502::sta(Machine_6502& machine, Word address, Byte reg_val) {
+  machine.get_module().set_at(address, reg_val); }
 void Machine_6502::sta_zp(Machine_6502& machine) {
-  sta(machine.get_cpu(), machine.get_zpg_address()); }
+  sta(machine, machine.get_zpg_address(), machine.get_cpu().A); }
 void Machine_6502::sta_zpx(Machine_6502& machine) {
-  sta(machine.get_cpu(), machine.get_zpgx_address()); }
+  sta(machine, machine.get_zpgx_address(), machine.get_cpu().A); }
 void Machine_6502::sta_abs(Machine_6502& machine) {
-  sta(machine.get_cpu(), machine.get_abs_address()); }
+  sta(machine, machine.get_abs_address(), machine.get_cpu().A); }
 void Machine_6502::sta_absx(Machine_6502& machine) {
-  sta(machine.get_cpu(), machine.get_absx_address()); }
+  sta(machine, machine.get_absx_address(), machine.get_cpu().A); }
 void Machine_6502::sta_absy(Machine_6502& machine) {
-  sta(machine.get_cpu(), machine.get_absy_address()); }
+  sta(machine, machine.get_absy_address(), machine.get_cpu().A); }
 void Machine_6502::sta_inx(Machine_6502& machine) {
-  sta(machine.get_cpu(), machine.get_indx_address()); }
+  sta(machine, machine.get_indx_address(), machine.get_cpu().A); }
 void Machine_6502::sta_iny(Machine_6502& machine) {
-  sta(machine.get_cpu(), machine.get_indy_address()); }
+  sta(machine, machine.get_indy_address(), machine.get_cpu().A); }
 
-void Machine_6502::stx(CPU& cpu, Byte value) {
-  cpu.X = value; }
+// void Machine_6502::stx(Machine_6502& machine, Word address, Byte reg_val) { cpu.X = value; }
 void Machine_6502::stx_zp(Machine_6502& machine) {
-  sta(machine.get_cpu(), machine.get_zpg_address()); }
+  sta(machine, machine.get_zpg_address(), machine.get_cpu().X); }
 void Machine_6502::stx_zpy(Machine_6502& machine) {
-  sta(machine.get_cpu(), machine.get_zpgy_address()); }
+  sta(machine, machine.get_zpgy_address(), machine.get_cpu().X); }
 void Machine_6502::stx_abs(Machine_6502& machine) {
-  sta(machine.get_cpu(), machine.get_abs_address()); }
+  sta(machine, machine.get_abs_address(), machine.get_cpu().X); }
 
-void Machine_6502::sty(CPU& cpu, Byte value) {
-  cpu.Y = value; }
+//void Machine_6502::sty(CPU& cpu, Byte value) { cpu.Y = value; }
 void Machine_6502::sty_zp(Machine_6502& machine) {
-  sta(machine.get_cpu(), machine.get_zpg_address()); }
+  sta(machine, machine.get_zpg_address(), machine.get_cpu().Y); }
 void Machine_6502::sty_zpx(Machine_6502& machine) {
-  sta(machine.get_cpu(), machine.get_zpgx_address()); }
+  sta(machine, machine.get_zpgx_address(), machine.get_cpu().Y); }
 void Machine_6502::sty_abs(Machine_6502& machine) {
-  sta(machine.get_cpu(), machine.get_abs_address()); }
+  sta(machine, machine.get_abs_address(), machine.get_cpu().Y); }
 
 CPU& Machine_6502::get_cpu() {
   return *m_cpu; }
