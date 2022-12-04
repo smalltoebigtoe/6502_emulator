@@ -13,15 +13,21 @@ cmake -DBUILD_TESTING=ON && make &&
 
 ## Current Instruction Status
 - [x] Bitwise Instructions
-- [ ] Branch Instructions
+- [x] Branch Instructions
 - [x] Compare Instructions
 - [x] Flag Instructions
 - [x] Jump Instructions
 - [x] Math Instructions
 - [x] Memory Instructions
 - [x] Register Instructions
-- [ ] Stack Instructions
-- [ ] Misc. Instructions
+- [x] Stack Instructions
+- [x] Misc. Instructions
+
+## TODO
+- Complete tests
+- Fix bugs (I'm almost sure there are tons)
+- Output on screen
+- Keyboard input (?)
 
 [Reference1](https://c64os.com/post/6502instructions)
 
