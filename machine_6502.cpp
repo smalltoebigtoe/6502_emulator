@@ -18,6 +18,33 @@ Machine_6502::Machine_6502()
 
 using namespace std::placeholders;
 void Machine_6502::init_handlers() {
+  /* BRANCH INSTRUCTIONS */
+  std::function<void(Machine_6502& machine)> bcs =
+    std::bind(&Machine_6502::bcs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> bcc =
+    std::bind(&Machine_6502::bcc, this, std::placeholders::_1);
+
+  std::function<void(Machine_6502& machine)> beq =
+    std::bind(&Machine_6502::beq, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> bne =
+    std::bind(&Machine_6502::bne, this, std::placeholders::_1);
+
+  std::function<void(Machine_6502& machine)> bpl =
+    std::bind(&Machine_6502::bpl, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> bmi =
+    std::bind(&Machine_6502::bmi, this, std::placeholders::_1);
+
+  std::function<void(Machine_6502& machine)> bvs =
+    std::bind(&Machine_6502::bvs, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> bvc =
+    std::bind(&Machine_6502::bvc, this, std::placeholders::_1);
+
+  /* OTHER INSTRUCTIONS */
+  std::function<void(Machine_6502& machine)> brk_imp =
+    std::bind(&Machine_6502::brk_imp, this, std::placeholders::_1);
+  std::function<void(Machine_6502& machine)> nop_imp =
+    std::bind(&Machine_6502::nop_imp, this, std::placeholders::_1);
+
   /* STACK INSTRUCTIONS */
   std::function<void(Machine_6502& machine)> pha =
     std::bind(&Machine_6502::pha, this, std::placeholders::_1);
@@ -334,6 +361,23 @@ void Machine_6502::init_handlers() {
   std::function<void(Machine_6502& machine)> sty_abs =
     std::bind(&Machine_6502::sty_abs, this, std::placeholders::_1);
 
+  /* BRANCH INSTRUCTIONS */
+  handlers.insert(std::make_pair(0xB0, bcs));
+  handlers.insert(std::make_pair(0x90, bcc));
+
+  handlers.insert(std::make_pair(0xF0, beq));
+  handlers.insert(std::make_pair(0xD0, bne));
+
+  handlers.insert(std::make_pair(0x10, bpl));
+  handlers.insert(std::make_pair(0x30, bmi));
+
+  handlers.insert(std::make_pair(0x70, bvs));
+  handlers.insert(std::make_pair(0x50, bvc));
+
+  /* OTHER INSTRUCTIONS */
+  handlers.insert(std::make_pair(0x00, brk_imp));
+  handlers.insert(std::make_pair(0xEA, nop_imp));
+
   /* STACK INSTRUCTIONS */
   handlers.insert(std::make_pair(0x48, pha));
   handlers.insert(std::make_pair(0x08, php));
@@ -510,6 +554,55 @@ void Machine_6502::init_handlers() {
   handlers.insert(std::make_pair(0x8C, sty_abs));
 }
 
+/* BRANCH INSTRUCTIONS */
+void Machine_6502::bcs(Machine_6502& machine) {
+  auto jump = machine.read_program_byte();
+  if (machine.get_cpu().CF)
+    machine.get_cpu().PC += jump;
+}
+void Machine_6502::bcc(Machine_6502& machine) {
+  auto jump = machine.read_program_byte();
+  if (!machine.get_cpu().CF)
+    machine.get_cpu().PC += jump;
+}
+void Machine_6502::beq(Machine_6502& machine) {
+  auto jump = machine.read_program_byte();
+  if (machine.get_cpu().ZF)
+    machine.get_cpu().PC += jump;
+}
+void Machine_6502::bne(Machine_6502& machine) {
+  auto jump = machine.read_program_byte();
+  if (!machine.get_cpu().NF)
+    machine.get_cpu().PC += jump;
+}
+void Machine_6502::bpl(Machine_6502& machine) {
+  auto jump = machine.read_program_byte();
+  if (!machine.get_cpu().NF)
+    machine.get_cpu().PC += jump;
+}
+void Machine_6502::bmi(Machine_6502& machine) {
+  auto jump = machine.read_program_byte();
+  if (machine.get_cpu().NF)
+    machine.get_cpu().PC += jump;
+}
+void Machine_6502::bvs(Machine_6502& machine) {
+  auto jump = machine.read_program_byte();
+  if (machine.get_cpu().OFF)
+    machine.get_cpu().PC += jump;
+}
+void Machine_6502::bvc(Machine_6502& machine) {
+  auto jump = machine.read_program_byte();
+  if (!machine.get_cpu().OFF)
+    machine.get_cpu().PC += jump;
+}
+
+/* OTHER INSTRUCTIONS */
+void Machine_6502::brk_imp(Machine_6502& machine) {
+  machine.get_cpu().BCF = true;
+  machine.get_cpu().PC++;
+}
+void Machine_6502::nop_imp(Machine_6502& machine) {;}
+
 /* STACK INSTRUCTIONS */
 void Machine_6502::pha(Machine_6502& machine) {
   machine.get_stack().push(machine.get_cpu().A); }
@@ -643,9 +736,9 @@ void Machine_6502::cmpy_abs(Machine_6502& machine) {
   cmp(machine, machine.get_module().get_at(machine.get_abs_address())); }
 
 /* MATH INSTRUCTIONS */
-void Machine_6502::adc(Machine_6502& machine, uint16_t address) {
+void Machine_6502::adc(Machine_6502& machine, Byte value) {
   auto init_a = machine.get_cpu().A;
-  Byte value = machine.get_module().get_at(address);
+  // can go above 8 bits
   uint16_t result = init_a + value;
   if (machine.get_cpu().CF)
     result += 1;

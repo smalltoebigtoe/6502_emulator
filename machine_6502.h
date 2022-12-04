@@ -35,6 +35,23 @@ class Machine_6502 {
     void reset();
     bool is_eop();
 
+    /* BRANCH INSTRUCTIONS */
+    void bcs(Machine_6502& machine);
+    void bcc(Machine_6502& machine);
+
+    void beq(Machine_6502& machine);
+    void bne(Machine_6502& machine);
+
+    void bpl(Machine_6502& machine);
+    void bmi(Machine_6502& machine);
+
+    void bvs(Machine_6502& machine);
+    void bvc(Machine_6502& machine);
+
+    /* OTHER INSTRUCTIONS */
+    void brk_imp(Machine_6502& machine);
+    void nop_imp(Machine_6502& machine);
+
     /* STACK INSTRUCTIONS */
     void pha(Machine_6502& machine);
     void php(Machine_6502& machine);
@@ -78,7 +95,7 @@ class Machine_6502 {
     void cmpy_abs(Machine_6502& machine);
 
     /* MATH INSTRUCTIONS */
-    void adc(Machine_6502& machine, uint16_t address);
+    void adc(Machine_6502& machine, Byte value);
     void adc_imm(Machine_6502& machine);
     void adc_zp(Machine_6502& machine);
     void adc_zpx(Machine_6502& machine);
